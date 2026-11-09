@@ -1,0 +1,64 @@
+# Parallel render: the composition is split into N slices, each rendered on its own runner at the same time,
+# then one job stitches the frames with the sound mix into the final MP4 (artifact "video").
+name: render
+on:
+  workflow_dispatch:
+    inputs:
+      comp: { description: "Composition id", default: "WindowShort" }
+      chunks: { description: "How many runners (max 20 at once on the free plan)", default: "20" }
+      scale: { description: "1 = 1080x1920", default: "1" }
+      audio: { description: "Sound mix (wav) in the repo", default: "audio/mix2.wav" }
+      name: { description: "Output file name", default: "short" }
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - id: m
+        run: echo "matrix=$(python3 -c "import json; print(json.dumps(list(range(int('${{ inputs.chunks }}')))))")" >> "$GITHUB_OUTPUT"
+
+  render:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        chunk: ${{ fromJson(needs.plan.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.remotion
+          key: remotion-browser-${{ hashFiles('package-lock.json') }}
+      - run: npx remotion browser ensure
+      - run: node scripts/render-chunk.mjs "${{ inputs.comp }}" ${{ matrix.chunk }} ${{ inputs.chunks }} out/frames ${{ inputs.scale }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frames-${{ matrix.chunk }}
+          path: out/frames
+          retention-days: 1
+          if-no-files-found: ignore
+
+  stitch:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { pattern: "frames-*", path: out/frames, merge-multiple: true }
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+      - name: Stitch frames + sound
+        run: |
+          ls out/frames | wc -l
+          ffmpeg -v error -y -framerate 30 -i out/frames/frame_%05d.jpg -i "${{ inputs.audio }}" \
+            -vf "scale=1080:1920:flags=lanczos,format=yuv420p" -c:v libx264 -preset medium -crf 18 \
+            -c:a aac -b:a 192k -map 0:v -map 1:a -shortest -movflags +faststart "${{ inputs.name }}.mp4"
+          ffprobe -v error -show_entries format=duration:stream=width,height,nb_frames -of compact "${{ inputs.name }}.mp4"
+      - uses: actions/upload-artifact@v4
+        with: { name: video, path: "${{ inputs.name }}.mp4", retention-days: 30 }
