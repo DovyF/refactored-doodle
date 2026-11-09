@@ -21,12 +21,11 @@ Example plan: `videos/awake/plan.json` ("What if you stayed awake for 11 days?")
 - Old: `src/videos/window`, `src/videos/bridge` (look engine from the MIT cartoon-3d-short skill).
 
 ## Improvement queue (one per chat, in order)
-1. **3 known fixes:** brain graphic sits on the beanie in mid shots; "middle" text covers faces in two-shots; book icon covers the body → keep overlays clear of faces. GitHub runs ~10 jobs at once, so set default chunks to 10.
-2. **Scripts + hooks:** rewrite the awake plan stronger; paradox hook in line 1, escalation, "Wait…", "You see," + everyday comparison, ironic loop ending, checked facts with sources.
-3. **Sound:** better music/SFX; option to use the owner's recorded voice (one file per line, timed by Whisper).
-4. **Visuals:** stronger night lighting, more camera variety, more expressions.
-5. New general sets: street, school, kitchen, outdoors.
-6. Later: weekly loop (write 7 plans at once on Monday, run make, post one a day, review numbers Sunday).
+Done: overlays kept off faces, real night look, 10 render chunks, stronger awake script, better sound/voice (own-voice option), more shots and faces.
+1. Re-render the awake plan and review the sheet; fix only specific beats.
+2. Visuals: more camera/character polish where the sheet shows weak spots.
+3. New general sets: street, school, kitchen, outdoors.
+4. Weekly loop: write 7 plans at once on Monday, run make, post one a day, review numbers Sunday.
 
 ## Log
 - 2026-11-09 · built plan pipeline + "awake" video (54 s, 26.5 min on GitHub) · ~8.8M effective tokens (Opus, one long chat).
