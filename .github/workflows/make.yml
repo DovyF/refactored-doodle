@@ -40,7 +40,9 @@ jobs:
         with: { node-version: 22 }
       - uses: actions/cache@v4
         id: nm
-        with: { path: node_modules, key: nm-${{ hashFiles('package-lock.json') }} }
+        with:
+          path: node_modules
+          key: nm-${{ hashFiles('package-lock.json') }}
       - if: steps.nm.outputs.cache-hit != 'true'
         run: npm ci --no-audit --no-fund
       - run: node scripts/bundle.mjs out/bundle
@@ -65,7 +67,9 @@ jobs:
         with: { node-version: 22 }
       - uses: actions/cache@v4
         id: nm
-        with: { path: node_modules, key: nm-${{ hashFiles('package-lock.json') }} }
+        with:
+          path: node_modules
+          key: nm-${{ hashFiles('package-lock.json') }}
       - if: steps.nm.outputs.cache-hit != 'true'
         run: npm ci --no-audit --no-fund
       - uses: actions/download-artifact@v4
