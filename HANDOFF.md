@@ -3,6 +3,11 @@
 You are the "brain" for an animated YouTube Shorts channel: "What if you…" videos starring **Toy** (chunky cartoon character, big eyes, yellow beanie).
 Everything you need is in this repo. Claude only writes words (plans, fixes); free GitHub machines make the videos.
 
+## From a normal Claude chat (no Claude Code needed)
+Write the plan, then output it as **one line of minified JSON** in a single code block. The owner copies it, opens
+github.com/DovyF/refactored-doodle/actions/workflows/make.yml on his phone → **Run workflow** → pastes it into
+"Paste the whole plan here" → Run. ~25 min later the run page has **video** and **sheet** downloads.
+
 ## How a video is made
 1. Write `videos/<id>/plan.json` following **PLAN_FORMAT.md** (script rules + every set, pose, face, prop, effect, sound).
 2. Commit + push, then run it: Actions → **make** → Run workflow → plan path (or `gh api -X POST repos/DovyF/refactored-doodle/actions/workflows/make.yml/dispatches -f ref=main -f 'inputs[plan]=videos/<id>/plan.json'`).

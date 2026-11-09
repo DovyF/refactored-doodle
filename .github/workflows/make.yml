@@ -6,6 +6,7 @@ name: make
 on:
   workflow_dispatch:
     inputs:
+      plan_json: { description: "Paste the whole plan here (from your Claude chat). Leave empty to use the file below.", default: "" }
       plan: { description: "Plan file", default: "videos/awake/plan.json" }
       chunks: { description: "Parallel render machines (GitHub runs ~10 at once; more just queue)", default: "10" }
       scale: { description: "Render scale (0.75 = 810x1440, upscaled to 1080x1920)", default: "0.75" }
@@ -17,6 +18,12 @@ jobs:
       matrix: ${{ steps.m.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
+      - name: Use the pasted plan, if any
+        env: { PLAN_JSON: "${{ inputs.plan_json }}", PLAN_FILE: "${{ inputs.plan }}" }
+        run: |
+          mkdir -p work
+          if [ -n "$PLAN_JSON" ]; then printf '%s' "$PLAN_JSON" > work/plan.json; else cp "$PLAN_FILE" work/plan.json; fi
+          python3 -c "import json; p = json.load(open('work/plan.json')); print('plan ok:', p.get('id'), len(p['lines']), 'lines')"
       - uses: actions/setup-python@v5
         with: { python-version: "3.12", cache: pip, cache-dependency-path: scripts/requirements.txt }
       - run: pip install -q -r scripts/requirements.txt
@@ -32,12 +39,12 @@ jobs:
       - name: Voice + word timings
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
-          mkdir -p work && python scripts/make_voice.py "${{ inputs.plan }}" models work
+          mkdir -p work && python scripts/make_voice.py work/plan.json models work
       - name: Music + sound effects
-        run: python scripts/make_sound.py "${{ inputs.plan }}" work
+        run: python scripts/make_sound.py work/plan.json work
       - name: Props for the renderer
         run: |
-          python -c "import json; json.dump({'plan': json.load(open('${{ inputs.plan }}')), 'words': json.load(open('work/words.json'))}, open('work/props.json', 'w'))"
+          python -c "import json; json.dump({'plan': json.load(open('work/plan.json')), 'words': json.load(open('work/words.json'))}, open('work/props.json', 'w'))"
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - uses: actions/cache@v4
