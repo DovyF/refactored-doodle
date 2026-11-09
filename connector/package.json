@@ -1,0 +1,14 @@
+{
+  "name": "video-maker-connector",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": { "start": "node server.mjs" },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "adm-zip": "^0.5.16",
+    "express": "^4.21.2",
+    "zod": "^3.25.0"
+  }
+}
