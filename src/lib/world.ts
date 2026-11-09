@@ -2,29 +2,31 @@
 // Reuses the skill's look engine (two-tone shading, ink, card shading, canvas pool) from ../bridge; only the sets,
 // cast and timeline are new. update(id, f, camera) poses everything for shot `id` at frame f.
 import * as THREE from "three";
-import { Batch, boxGeo, V, lam, quad, tri } from "../bridge/build";
-import { grassHD, cobbleHD, stoneHD, cloudHD, ctex } from "../bridge/paint";
-import { LIGHTS, LOOK, LightPreset } from "../bridge/lights";
-import { TONE, CHAR, untone } from "../bridge/shade";
-import { NOINK } from "../bridge/ink";
-import { Pool, Actor, Fx } from "../bridge/cast";
-import { Pen, bodyFront, fxContact, fxBurst, Outfit, FrontOpts } from "./toonx";
-import {
-  FPS, SHOTS, BED, WH, OFF, YOU_BED, YOU_WIN, YOU_DESK, DESK_TOP, FOLDER_AT, WIN_C, V3, camAt, youExpr, aideAt, folderOnDesk,
-  stampAt, blink, LightName,
-} from "./story";
-import { wallpaper, wainscot, carpet, ceiling, blanket, mahogany, drape, sheetTex, facade, balustrade, usFlag, officeWall, officeCarpet, folderTex, leather, BAY } from "./paintx";
+import { Batch, boxGeo, V, lam, quad, tri } from "../videos/bridge/build";
+import { grassHD, cobbleHD, stoneHD, cloudHD, ctex } from "../videos/bridge/paint";
+import { LIGHTS, LOOK, LightPreset } from "../videos/bridge/lights";
+import { TONE, CHAR, untone } from "../videos/bridge/shade";
+import { NOINK } from "../videos/bridge/ink";
+import { Pool, Actor, Fx } from "../videos/bridge/cast";
+import { Pen, fxContact } from "../videos/bridge/toon";
+import { drawToy } from "./toy";
+import { CARD_DRAW } from "./cards";
+import type { FrameState } from "./state";
+import { cardboard, parquet, glassTex } from "../videos/window/paintw";
+import { BED, WH, OFF, DIN, YOU_BED, YOU_DESK, DESK_TOP, TABLE_TOP, CAR_AT, RECEIPT_AT, PINBALL_AT, CLOCK_AT, V3, LightName } from "./sets";
+import { receiptTex } from "../videos/window/paintw";
+import { wallpaper, wainscot, carpet, ceiling, blanket, mahogany, drape, sheetTex, facade, balustrade, usFlag, officeWall, officeCarpet, folderTex, leather, BAY } from "../videos/window/paintx";
 
 // ---------------- light presets: the skill's day light, plus a brighter-shade interior version ----------------
 const INT: LightPreset = { ...LIGHTS.day, shade: [0.6, 0.56, 0.66], lift: [0.06, 0.06, 0.1], fogNear: 60, fogFar: 600, charShade: 0.9 };
-const PRESET: Record<LightName, LightPreset> = { int: INT, day: { ...LIGHTS.day, fogNear: 60, fogFar: 520 } };
+const NIGHT: LightPreset = { ...LIGHTS.day, lit: [0.5, 0.56, 0.9], shade: [0.17, 0.19, 0.36], lift: [0.03, 0.04, 0.12], charTint: [0.72, 0.78, 1.0], charShade: 0.82,
+  fog: "#1b2240", fogNear: 60, fogFar: 600, sunCol: "#a9bcff", sunI: 1.6, sky: "#3a4a8a", ground: "#20203a", hemiI: 0.4 };
+const PRESET: Record<LightName, LightPreset> = { int: INT, day: { ...LIGHTS.day, fogNear: 60, fogFar: 520 }, golden: { ...LIGHTS.golden, fogNear: 80, fogFar: 600 }, night: NIGHT };
+const NIGHT_SKY = { c: ["#3a4378", "#2c3566", "#202852", "#161d40", "#0d1230"], e: [0, 3, 8, 16, 40] };
 
 // ---------------- cast ----------------
 const HAIR = "#4a3324";
-export const YOU_PJ: Outfit = { jacket: "#86acdc", pants: "#86acdc", boots: "#f4f1ea", hat: "hair", hair: HAIR, buttons: "#ffffff", stripes: "#6a92c9" };
-export const YOU_SUIT: Outfit = { jacket: "#273452", pants: "#273452", boots: "#1d1b22", hat: "hair", hair: HAIR, buttons: "#1d2640", tie: "#c3343c", shirt: "#f6f3ec" };
-const AIDE: Outfit = { jacket: "#2a2a30", pants: "#2a2a30", boots: "#151418", hat: "hair", hair: "#22191a", buttons: "#18181c", tie: "#3c4f7a", shirt: "#f6f3ec", skin: "#c99067" };
-const YOU_SEED = 4, AIDE_SEED = 2;
+
 /** drawing resolution by distance: [canvas w, h, scale from the 600 x 1000 design] */
 const tier = (d: number): [number, number, number] => (d < 3.2 ? [1800, 3000, 3.0] : d < 6.5 ? [1080, 1800, 1.8] : d < 16 ? [480, 800, 0.8] : [240, 400, 0.4]);
 const q = (v: number, n = 120) => Math.round(v * n) / n;
@@ -89,6 +91,12 @@ export class World {
   private flags: THREE.Mesh[] = [];
   private folder: THREE.Mesh; private folderMats: THREE.Material[];
   private sunCache = new Map<number, THREE.Vector3>();
+  private boxes: THREE.Mesh[] = [];
+  private props: Record<string, THREE.Object3D[]> = {};
+  private clockHands: THREE.Object3D[] = [];
+  private carFrom = 0; private carTo = 0;
+  private food: Record<string, THREE.Group> = {};
+  private receipt: THREE.Mesh; private receiptMats: THREE.Material[];
   private v = new THREE.Vector3();
 
   constructor() {
@@ -244,7 +252,9 @@ export class World {
     box(wc, hole[1], 9.05, -0.02, hole[1] + 0.14, 11.75, 0.12, M.trim);
     box(wc, hole[0] - 0.14, 11.6, -0.02, hole[1] + 0.14, 11.78, 0.12, M.trim);
     box(wc, hole[0] - 0.3, 8.95, -0.05, hole[1] + 0.3, 9.2, 0.3, M.trim);
-    box(wc, hole[0], 10.9, -0.1, hole[1], 11.6, -0.04, lam("p_glass", () => ({ color: "#6f8aa6" })));
+    box(wc, hole[0], 9.2, -0.1, hole[1], 11.6, -0.04, lam("p_glass", () => ({ color: "#6f8aa6" })));
+    box(wc, (hole[0] + hole[1]) / 2 - 0.03, 9.2, -0.04, (hole[0] + hole[1]) / 2 + 0.03, 11.6, 0.0, M.trim);
+    box(wc, hole[0], 10.37, -0.04, hole[1], 10.43, 0.0, M.trim);
     // cornice, roof balustrade, chimneys
     box(wc, L - 0.4, HB - 0.6, -0.1, Rr + 0.4, HB, 0.55, M.trim);
     wn.add(quad(V(L - 0.3, HB, 0.4), V(Rr + 0.3, HB, 0.4), V(Rr + 0.3, HB + 1.1, 0.4), V(L - 0.3, HB + 1.1, 0.4), 10, 1), M.balus);
@@ -315,8 +325,126 @@ export class World {
     this.folderMats = [folderTex(false), folderTex(true)].map((t, i) => lam("p_folderM" + i, () => ({ map: t })));
     const fg = boxGeo(V(-0.17, 0, -0.13), V(0.17, 0.018, 0.13), 0, true);
     this.folder = new THREE.Mesh(fg, this.folderMats[0]);
-    this.folder.position.set(...FOLDER_AT); this.folder.rotation.y = 0.16; this.folder.castShadow = true; this.folder.receiveShadow = true;
+    this.folder.position.set(OFF[0], DESK_TOP + 0.012, -1.5); this.folder.rotation.y = 0.16; this.folder.castShadow = true; this.folder.receiveShadow = true;
     R.add(this.folder);
+
+    // ================= NEW FOR THIS VIDEO =================
+    // bedroom: closed glass in the tall window, moving boxes that pop in
+    const glassM = new THREE.MeshBasicMaterial({ map: glassTex(), transparent: true, depthWrite: false });
+    const gl = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 2.1), glassM); gl.rotation.y = -Math.PI / 2; gl.position.set(BED[0] + 3.28, 2.15, BED[2] - 1.2); R.add(gl);
+    const boxM = lam("p_cardboard", () => ({ map: cardboard() }));
+    const BOXES: [number, number, number, number][] = [[-0.85, 0, -0.25, 0.55], [0.45, 0, 0.05, 0.5], [-0.85, 0.44, -0.25, 0.42], [-1.35, 0, -1.3, 0.5], [1.55, 0, -0.55, 0.5],
+      [1.55, 0.4, -0.55, 0.4], [-0.2, 0, 0.55, 0.45], [1.1, 0, 0.65, 0.5], [-1.35, 0.4, -1.3, 0.38], [0.45, 0.4, 0.05, 0.4]];
+    for (const [x, y, z, sz] of BOXES) {
+      const m = new THREE.Mesh(boxGeo(V(-sz / 2, 0, -sz / 2), V(sz / 2, sz * 0.8, sz / 2), 0, true), boxM);
+      m.position.set(BED[0] + x, y, BED[2] + z); m.rotation.y = (x * 7) % 0.6; m.castShadow = true; m.receiveShadow = true; m.visible = false;
+      this.boxes.push(m); R.add(m);
+    }
+    // White House driveway: a black SUV
+    const car = new Batch(), [cx, , cz] = CAR_AT, carM = lam("p_car", () => ({ color: "#323a48" })), winM = lam("p_carWin", () => ({ color: "#6a84a3" }));
+    const wheelM = lam("p_tire", () => ({ color: "#141417" })), chromeM = lam("p_chrome", () => ({ color: "#c9ccd2" }));
+    box(car, cx - 2.6, 0.45, cz - 1.0, cx + 2.6, 1.35, cz + 1.0, carM);
+    box(car, cx - 1.9, 1.35, cz - 0.95, cx + 1.7, 2.05, cz + 0.95, carM);
+    for (const sd of [-1, 1]) box(car, cx - 1.75, 1.42, cz + sd * 0.96 - 0.01, cx + 1.55, 1.95, cz + sd * 0.96 + 0.01, winM);
+    box(car, cx - 2.62, 1.42, cz - 0.8, cx - 1.88, 1.95, cz + 0.8, winM);
+    box(car, cx - 2.66, 0.55, cz - 0.9, cx - 2.6, 0.75, cz + 0.9, chromeM);
+    for (const [wx2, wz2] of [[-1.6, -1.0], [1.6, -1.0], [-1.6, 1.0], [1.6, 1.0]]) car.add(new THREE.CylinderGeometry(0.45, 0.45, 0.3, 20).rotateX(Math.PI / 2), wheelM, M4(cx + wx2, 0.45, cz + wz2));
+    for (const sd of [-0.62, 0.62]) car.add(new THREE.SphereGeometry(0.12, 10, 8), lam("p_headl", () => ({ color: "#fff6d8", emissive: new THREE.Color(0.6, 0.55, 0.4) })), M4(cx - 2.6, 1.05, cz + sd));
+    this.carFrom = R.children.length; car.build(R); this.carTo = R.children.length;
+    // dining room: walls with windows, a long table with a white cloth, chairs, chandelier, breakfast props
+    const ds = new Batch(), db = new Batch(), [dx, , dz] = DIN, DW = 4.4, DH = 4.0, DB = dz - 3.6;
+    ds.add(floorQ(dx - DW, dx + DW, DB, dz + 3.5, 0), lam("p_dfloor", () => ({ map: parquet() })));
+    ds.add(ceilQ(dx - DW, dx + DW, DB, dz + 3.5, DH), M.ceil);
+    const dwin = [-2.4, 0, 2.4].map((x) => dx + x);
+    wallZ(ds, dx - DW, dx + DW, 0, DH, DB, M.owall, dwin.map((x) => [x - 0.7, x + 0.7, 1.0, 3.3] as H4), 2.2);
+    wallX(ds, dx - DW, DB, dz + 3.5, 0, DH, 1, M.wall, [], 1.6);
+    wallX(ds, dx + DW, DB, dz + 3.5, 0, DH, -1, M.wall, [], 1.6);
+    box(db, dx - DW, DH - 0.22, DB, dx + DW, DH, DB + 0.15, M.gold);
+    for (const x of dwin) {
+      for (const sd of [-1, 1]) box(db, x + sd * 0.7 - 0.07, 0.95, DB - 0.02, x + sd * 0.7 + 0.07, 3.4, DB + 0.1, M.trim);
+      box(db, x - 0.77, 3.3, DB - 0.02, x + 0.77, 3.42, DB + 0.1, M.trim); box(db, x - 0.8, 0.9, DB - 0.05, x + 0.8, 1.02, DB + 0.2, M.trim);
+      for (const sd of [-1, 1]) box(db, x + sd * 0.78 - (sd < 0 ? 0.36 : 0), 0.02, DB + 0.12, x + sd * 0.78 + (sd > 0 ? 0.36 : 0), 3.7, DB + 0.3, M.drape);
+    }
+    const clothM = lam("p_cloth", () => ({ color: "#f7f4ec" }));
+    box(db, dx - 1.6, TABLE_TOP - 0.04, dz - 0.75, dx + 1.6, TABLE_TOP, dz + 0.15, clothM);
+    box(db, dx - 1.62, TABLE_TOP - 0.3, dz - 0.77, dx + 1.62, TABLE_TOP - 0.04, dz + 0.17, clothM);
+    for (const [x, z2] of [[-1.4, -0.6], [1.4, -0.6], [-1.4, 0.0], [1.4, 0.0]]) cyl(db, dx + x, 0, dz + z2, 0.05, TABLE_TOP - 0.3, M.wood, 8);
+    box(db, dx - 0.32, 0.45, dz - 1.75, dx + 0.32, 0.55, dz - 1.2, M.wood);
+    box(db, dx - 0.3, 0.55, dz - 1.75, dx + 0.3, 1.75, dz - 1.62, M.wood);
+    box(db, dx - 0.22, 1.0, dz - 1.62, dx + 0.22, 1.6, dz - 1.6, lam("p_seat", () => ({ color: "#8c2d33" })));
+    const DC = V(dx, 3.0, dz - 0.4);
+    cyl(db, DC.x, DC.y + 0.3, DC.z, 0.025, DH - DC.y - 0.3, M.gold, 8);
+    db.add(new THREE.TorusGeometry(0.45, 0.04, 8, 32).rotateX(Math.PI / 2), M.gold, M4(DC.x, DC.y, DC.z));
+    for (let i = 0; i < 6; i++) { const a = (i / 6) * Math.PI * 2; const bl = new THREE.Mesh(new THREE.SphereGeometry(0.045, 10, 8), bulb); bl.position.set(DC.x + Math.cos(a) * 0.45, DC.y + 0.12, DC.z + Math.sin(a) * 0.45); bl.layers.set(NOINK); R.add(bl); }
+    ds.build(R, false); db.build(R);
+    // breakfast props (pop in on their words), a plate, the receipt
+    const plateM = lam("p_plate", () => ({ color: "#ffffff" })), pancakeM = lam("p_pancake", () => ({ color: "#d99a4e" })), syrupM = lam("p_syrup", () => ({ color: "#8a4a18" }));
+    const baconM = lam("p_bacon", () => ({ color: "#b8433a" })), juiceM = lam("p_juice", () => ({ color: "#f5a623", emissive: new THREE.Color(0.25, 0.12, 0) })), yolkM = lam("p_yolk", () => ({ color: "#ffc93c" }));
+    const T0 = TABLE_TOP;
+    const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.17, 0.025, 28), plateM); plate.position.set(dx, T0 + 0.013, dz - 0.5); R.add(plate);
+    const mk = (name: string, build: (g: THREE.Group) => void, at: V3) => { const g = new THREE.Group(); build(g); g.position.set(...at); g.visible = false; g.traverse((o) => { o.castShadow = true; }); this.food[name] = g; R.add(g); };
+    mk("pancakes", (g) => { for (let i = 0; i < 5; i++) { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.028, 24), pancakeM); m.position.y = 0.015 + i * 0.03; g.add(m); }
+      const sy = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.012, 20), syrupM); sy.position.y = 0.165; g.add(sy);
+      const bt = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.05), yolkM); bt.position.y = 0.185; g.add(bt); }, [dx, T0 + 0.025, dz - 0.5]);
+    mk("bacon", (g) => { for (let i = 0; i < 3; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.22), baconM); m.position.set(i * 0.07, 0.01, 0); m.rotation.z = 0.15 * Math.sin(i); g.add(m); } }, [dx + 0.3, T0, dz - 0.45]);
+    mk("juice", (g) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.04, 0.16, 16), juiceM); m.position.y = 0.08; g.add(m); }, [dx - 0.32, T0, dz - 0.6]);
+    mk("eggs", (g) => { for (const x of [0, 0.1]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.01, 18), plateM); w.position.set(x, 0.006, 0); g.add(w); const y = new THREE.Mesh(new THREE.SphereGeometry(0.025, 12, 8), yolkM); y.position.set(x, 0.015, 0); y.scale.y = 0.5; g.add(y); } }, [dx - 0.42, T0, dz - 0.3]);
+    mk("toast", (g) => { for (let i = 0; i < 2; i++) { const m = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.11, 0.015), pancakeM); m.position.set(i * 0.03, 0.06, i * 0.02); m.rotation.x = -0.3; g.add(m); } }, [dx + 0.48, T0, dz - 0.25]);
+    mk("fancy", (g) => { for (let i = 0; i < 6; i++) { const x = -1.3 + i * 0.52; const p = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.13, 0.02, 24), plateM); p.position.set(x, 0.01, -0.05); g.add(p);
+        const c = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.22, 10), clothM); c.position.set(x + 0.26, 0.11, -0.3); g.add(c);
+        const fl = new THREE.Mesh(new THREE.SphereGeometry(0.022, 8, 6), bulb); fl.position.set(x + 0.26, 0.24, -0.3); fl.scale.y = 1.6; fl.layers.set(NOINK); g.add(fl); } }, [dx, T0, dz]);
+    this.receiptMats = [0, 1, 2, 3].map((k) => new THREE.MeshLambertMaterial({ map: receiptTex(k), emissive: new THREE.Color(0.35, 0.35, 0.35), emissiveMap: receiptTex(k) }));
+    this.receipt = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.42), this.receiptMats[0]);
+    this.receipt.rotation.set(-Math.PI / 2, 0, 0.12); this.receipt.position.set(...RECEIPT_AT); this.receipt.visible = false; this.receipt.receiveShadow = true;
+    R.add(this.receipt);
+
+    // ================= LIBRARY PROPS (switched on by the plan) =================
+    const reg = (name: string, ...objs: THREE.Object3D[]) => { (this.props[name] ??= []).push(...objs); };
+    this.boxes.forEach((b) => reg("boxes", b));
+    for (const [name, g] of Object.entries(this.food)) reg(name, g);
+    reg("receipt", this.receipt); reg("folder", this.folder);
+    const grp = (at: V3) => { const g = new THREE.Group(); g.position.set(...at); g.visible = false; R.add(g); return g; };
+    const mesh = (geo: THREE.BufferGeometry, m: THREE.Material, x: number, y: number, z: number) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = true; o.receiveShadow = true; return o; };
+    // pinball machine (office): cabinet on legs, tilted glowing playfield, back box
+    {
+      const g = grp(PINBALL_AT), cab = lam("p_pinCab", () => ({ color: "#7a2fbf" })), legM = lam("p_pinLeg", () => ({ color: "#c9ccd2" }));
+      const field = new THREE.MeshLambertMaterial({ map: pinballTex(), emissive: new THREE.Color(0.55, 0.55, 0.55), emissiveMap: pinballTex() });
+      const back = new THREE.MeshLambertMaterial({ map: pinBackTex(), emissive: new THREE.Color(0.8, 0.8, 0.8), emissiveMap: pinBackTex() });
+      for (const [x, z] of [[-0.3, -0.55], [0.3, -0.55], [-0.3, 0.55], [0.3, 0.55]]) g.add(mesh(new THREE.BoxGeometry(0.06, 0.8, 0.06), legM, x, 0.4, z));
+      const body = mesh(new THREE.BoxGeometry(0.7, 0.3, 1.25), cab, 0, 0.95, 0); body.rotation.x = 0.12; g.add(body);
+      const pf = mesh(new THREE.PlaneGeometry(0.62, 1.15), field, 0, 1.11, 0); pf.rotation.x = -Math.PI / 2 + 0.12; g.add(pf);
+      g.add(mesh(new THREE.BoxGeometry(0.72, 0.62, 0.16), cab, 0, 1.55, -0.62));
+      const bb = mesh(new THREE.PlaneGeometry(0.62, 0.5), back, 0, 1.55, -0.535); g.add(bb);
+      for (const sd of [-1, 1]) g.add(mesh(new THREE.BoxGeometry(0.06, 0.04, 0.05), legM, sd * 0.37, 1.04, 0.6));
+      reg("pinball", g);
+    }
+    // science-fair poster board (dining table): three hinged panels
+    {
+      const g = grp([DIN[0] - 0.95, TABLE_TOP, DIN[2] - 0.4]); g.rotation.y = 0.3;
+      const mats = [0, 1, 2].map((k) => new THREE.MeshLambertMaterial({ map: posterTex(k), side: THREE.DoubleSide, emissive: new THREE.Color(0.25, 0.25, 0.25), emissiveMap: posterTex(k) }));
+      const mid = mesh(new THREE.PlaneGeometry(0.62, 0.78), mats[1], 0, 0.39, 0); g.add(mid);
+      for (const sd of [-1, 1]) { const w = mesh(new THREE.PlaneGeometry(0.42, 0.78), mats[sd < 0 ? 0 : 2], sd * (0.31 + 0.18), 0.39, 0.12); w.rotation.y = -sd * 0.55; g.add(w); }
+      g.userData.pop = true; reg("poster", g);
+    }
+    // wall clock (bedroom) with hands the plan can spin
+    {
+      const g = grp(CLOCK_AT);
+      const face = mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 40), new THREE.MeshLambertMaterial({ map: clockTex(), emissive: new THREE.Color(0.3, 0.3, 0.3), emissiveMap: clockTex() }), 0, 0, 0);
+      face.rotation.x = Math.PI / 2; face.rotation.y = Math.PI / 2; g.add(face);
+      g.add(mesh(new THREE.TorusGeometry(0.35, 0.035, 10, 40), lam("p_clockRim", () => ({ color: "#3a2a20" })), 0, 0, 0.01));
+      const handM = lam("p_hand", () => ({ color: "#1e1a1d" }));
+      for (const [len, w] of [[0.2, 0.03], [0.29, 0.02]] as const) { const h = new THREE.Group(); const b = mesh(new THREE.BoxGeometry(w, len, 0.012), handM, 0, len / 2 - 0.03, 0.045); h.add(b); g.add(h); this.clockHands.push(h); }
+      reg("clock", g);
+    }
+    // coffee mug (put on the office desk or the dining table by the plan)
+    {
+      const g = grp([OFF[0] + 0.55, DESK_TOP, -1.45]);
+      g.add(mesh(new THREE.CylinderGeometry(0.06, 0.055, 0.12, 20), lam("p_mug", () => ({ color: "#f4efe6" })), 0, 0.06, 0));
+      g.add(mesh(new THREE.TorusGeometry(0.035, 0.012, 8, 16), lam("p_mug", () => ({ color: "#f4efe6" })), 0.065, 0.065, 0));
+      g.userData.pop = true; reg("coffee", g);
+    }
+    // the car on the lawn (always there unless the plan hides it)
+    for (const m of this.root.children.slice(this.carFrom, this.carTo)) reg("car", m);
 
     // flags: roof (big) + office stand (small); waving planes
     for (const [x, y, z, w, h] of [[wx, HB + 8.6 - 1.0, -6, 3.0, 1.6], [ox + 1.75, 2.72 - 0.35, OB + 0.75, 1.0, 0.56]] as const) {
@@ -326,32 +454,17 @@ export class World {
     }
   }
 
-  /** camera-relative sun, frozen per shot */
-  private shotSun(id: number) {
-    let v = this.sunCache.get(id);
-    if (v) return v;
-    const s = SHOTS[id - 1];
-    let fx = 0, fz = 0;
-    for (let f = s.a; f < s.b; f += 3) { const c = camAt(id, f), x = c.look[0] - c.pos[0], z = c.look[2] - c.pos[2], n = Math.hypot(x, z) || 1; fx += x / n; fz += z / n; }
-    const n = Math.hypot(fx, fz) || 1; fx /= n; fz /= n;
-    const az = THREE.MathUtils.degToRad(s.sunAz), el = THREE.MathUtils.degToRad(s.sunEl);
-    const hx = fx * Math.cos(az) - fz * Math.sin(az), hz = fz * Math.cos(az) + fx * Math.sin(az);
-    v = new THREE.Vector3(hx * Math.cos(el), Math.sin(el), hz * Math.cos(el)).normalize();
-    this.sunCache.set(id, v);
-    return v;
-  }
   private actor(i: number) { while (this.actors.length <= i) this.actors.push(new Actor(this.root)); return this.actors[i]; }
   private fx(i: number) { while (this.fxs.length <= i) this.fxs.push(new Fx(this.root)); return this.fxs[i]; }
 
-  update(id: number, f: number, cam: THREE.PerspectiveCamera, scene: THREE.Scene) {
-    const t = f / FPS, s = SHOTS[id - 1], L = PRESET[s.light];
-    const c = camAt(id, f);
+  update(S: FrameState, cam: THREE.PerspectiveCamera, scene: THREE.Scene) {
+    const t = S.t, L = PRESET[S.light], c = S.cam;
     cam.position.set(...c.pos); cam.up.set(0, 1, 0); cam.lookAt(...c.look); cam.rotateZ(c.roll);
     cam.fov = c.fov; cam.near = 0.05; cam.far = 1500; cam.updateProjectionMatrix(); cam.updateMatrixWorld();
     cam.layers.enable(NOINK);
     const focus = V(...c.look), dist = cam.position.distanceTo(focus);
     // ---- light rig ----
-    const sunDir = this.shotSun(id);
+    const sunDir = V(...S.sun).normalize();
     this.hemi.color.set(L.sky); this.hemi.groundColor.set(L.ground); this.hemi.intensity = L.hemiI;
     this.sun.color.set(L.sunCol); this.sun.intensity = L.sunI;
     const Rr = THREE.MathUtils.clamp(dist * 1.15 + 7, 10, 70);
@@ -359,79 +472,64 @@ export class World {
     const sc = this.sun.shadow.camera;
     sc.left = -Rr; sc.right = Rr; sc.top = Rr; sc.bottom = -Rr; sc.near = 20; sc.far = 480; sc.updateProjectionMatrix();
     this.sun.shadow.bias = L.bias; this.sun.shadow.normalBias = L.normalBias * (Rr / 12);
+    const lk = S.light === "golden" ? LOOK.golden : LOOK.day;
     TONE.uLitCol.value.set(...L.lit); TONE.uShadeCol.value.set(...L.shade); TONE.uShadeLift.value.set(...L.lift);
-    TONE.uLambert.value = L.lambert; TONE.uSideK.value = L.sideK; TONE.uTerm.value = L.term; TONE.uBounce.value.set(...LOOK.day.bounce); TONE.uSat.value = LOOK.day.sat;
+    TONE.uLambert.value = L.lambert; TONE.uSideK.value = L.sideK; TONE.uTerm.value = L.term; TONE.uBounce.value.set(...lk.bounce); TONE.uSat.value = lk.sat;
     CHAR.uCharTint.value.set(...L.charTint); CHAR.uCharShade.value = L.charShade; CHAR.uGrad.value = L.charGrad;
     CHAR.uBodyGrad.value = L.bodyGrad; CHAR.uSideTint.value.set(...L.sideTint);
     // ---- sky + fog ----
-    const su = this.skyMat.uniforms, K = LOOK.day;
-    K.sky.c.forEach((h, i) => untone(h, su["c" + i].value));
-    const e = K.sky.e.map((deg) => THREE.MathUtils.degToRad(deg));
+    const su = this.skyMat.uniforms, sky = S.light === "night" ? NIGHT_SKY : lk.sky;
+    sky.c.forEach((h, i) => untone(h, su["c" + i].value));
+    const e = sky.e.map((deg) => THREE.MathUtils.degToRad(deg));
     su.e.value.set(e[1], e[2], e[3], e[4]);
     this.sky.position.copy(cam.position);
     untone(L.fog, this.fog.color); this.fog.near = L.fogNear; this.fog.far = L.fogFar;
     scene.fog = this.fog; scene.background = null;
-    for (const cl of this.clouds) { cl.m.position.copy(cam.position).add(cl.off); cl.m.lookAt(cam.position.x, cl.m.position.y, cam.position.z); }
+    for (const cl of this.clouds) { cl.m.visible = S.light !== "night"; cl.m.position.copy(cam.position).add(cl.off); cl.m.lookAt(cam.position.x, cl.m.position.y, cam.position.z); }
     // ---- props ----
-    this.folder.visible = folderOnDesk(f);
-    this.folder.material = this.folderMats[stampAt(f) > 0 ? 1 : 0];
+    for (const [name, objs] of Object.entries(this.props)) {
+      const k = S.props[name] ?? (name === "car" ? 1 : 0);
+      for (const o of objs) { o.visible = k > 0.001; if (o.userData.pop || name === "boxes" || ["pancakes", "bacon", "juice", "eggs", "toast"].includes(name)) o.scale.setScalar(Math.max(0.001, k)); }
+    }
+    this.receipt.material = this.receiptMats[3];
+    this.clockHands.forEach((h, i) => { h.rotation.z = -(S.clockSpin * (i ? 12 : 1) + (i ? 0.3 : 1.9)) * Math.PI * 2 / (i ? 1 : 12); });
     for (const fl of this.flags) {
       const p = fl.geometry.attributes.position as THREE.BufferAttribute, { w, h } = fl.userData as { w: number; h: number };
-      for (let i = 0; i < p.count; i++) {
-        const u = (i % 15) / 14, y = i < 15 ? h / 2 : -h / 2;
-        p.setXYZ(i, u * w, y + 0.05 * w * u * Math.sin(t * 4 - u * 3), 0.12 * w * u * Math.sin(t * 5.5 - u * 5));
-      }
+      for (let i = 0; i < p.count; i++) { const u = (i % 15) / 14, y = i < 15 ? h / 2 : -h / 2; p.setXYZ(i, u * w, y + 0.05 * w * u * Math.sin(t * 4 - u * 3), 0.12 * w * u * Math.sin(t * 5.5 - u * 5)); }
       p.needsUpdate = true;
     }
     // ---- cast ----
     const right = V(0, 0, 0).setFromMatrixColumn(cam.matrixWorld, 0);
     const sx = sunDir.dot(right), light = Math.round(Math.atan2(-sunDir.y, sx) / (Math.PI / 4)) * (Math.PI / 4);
-    const places: { key: string; draw: (p: Pen) => void; x: number; y: number; z: number; size: [number, number, number] }[] = [];
-    const fx: { key: string; cw: number; ch: number; draw: (p: Pen) => void; x: number; y: number; z: number; w: number; h: number; flat?: boolean; rot?: number }[] = [];
-    const person = (key: string, o: Outfit, x: number, y: number, z: number, opts: FrontOpts) => {
-      const d = cam.position.distanceTo(this.v.set(x, y + 1.2, z)), size = tier(d);
-      const o2: FrontOpts = { ...opts, light };
-      places.push({ key: `${key}|${JSON.stringify(o2, (_k, v) => (typeof v === "number" ? q(v) : v))}`, draw: (p) => bodyFront(p, o, o2), x, y, z, size });
-    };
-    const contact = (x: number, y: number, z: number, sc2 = 1) =>
-      fx.push({ key: "blob|contact|#5a5f86", cw: 128, ch: 128, draw: (p) => fxContact(p as unknown as Pen, "#5a5f86"), x, y: y + 0.02, z, w: 0.52 * sc2, h: 0.4 * sc2, flat: true });
-    const ye = youExpr(f);
-    if (id === 1) person("youPJ", YOU_PJ, ...YOU_BED, { mode: "sit", expr: ye.expr, look: ye.look, blink: ye.lid, seed: YOU_SEED });
-    if (id === 2) person("youPJ", YOU_PJ, ...YOU_WIN, { mode: "stand", expr: ye.expr, look: ye.look, blink: ye.lid, seed: YOU_SEED });
-    if (id === 3) {
-      person("youSuit", YOU_SUIT, ...YOU_DESK, { mode: "stand", expr: ye.expr, look: ye.look, blink: ye.lid, seed: YOU_SEED });
-      const a = aideAt(f);
-      if (a.x < OFF[0] + 4.4) {
-        person("aide", AIDE, a.x, 0, a.z, {
-          mode: a.walking ? "stroll" : "stand", phase: q(a.phase, 60), expr: "stern", facing: -1, look: -1, blink: blink(f, 11), seed: AIDE_SEED,
-          prop: a.holding ? ["folder", q(a.reach, 30)] : null,
-        });
-        contact(a.x, 0, a.z);
-      }
-      const st = stampAt(f);
-      if (st > 0 && st < 1) fx.push({ key: `burst${q(st, 30)}`, cw: 500, ch: 500, draw: (p) => fxBurst(p as unknown as Pen, q(st, 30)), x: FOLDER_AT[0], y: FOLDER_AT[1] + 0.12, z: FOLDER_AT[2] + 0.05, w: 0.5, h: 0.5 });
-    }
-    // fountain spray on the lawn (soft white puffs rising and falling)
-    if (id === 2) for (let k = 0; k < 7; k++) {
-      const u = ((t * 0.9 + k / 7) % 1), hgt = 1.4 + 3.4 * Math.sin(Math.PI * u);
-      fx.push({ key: "spray", cw: 128, ch: 128, draw: spray, x: WH[0] + Math.cos(k * 2.4) * 0.4 * u, y: hgt, z: 34 + Math.sin(k * 2.4) * 0.4 * u, w: 1.1 + u * 0.8, h: 1.1 + u * 0.8 });
-    }
+    const fx: { key: string; cw: number; ch: number; draw: (p: Pen) => void; x: number; y: number; z: number; w: number; h: number; flat?: boolean; rot?: number; soft?: boolean }[] = [];
     let ai = 0;
-    for (const p of places) {
-      const a = this.actor(ai++);
-      const [w, h, k] = p.size;
-      a.r = this.pool.req(p.key, w, h, k, p.draw as unknown as (pp: never) => void);
-      a.mesh.visible = true; a.mesh.position.set(p.x, p.y, p.z);
-      a.mesh.rotation.set(0, Math.atan2(cam.position.x - p.x, cam.position.z - p.z), 0);
-      a.mesh.scale.set(1, 1, 1); a.mesh.castShadow = false;
+    for (const a of S.cast) {
+      const [x, y, z] = a.pos, d = cam.position.distanceTo(this.v.set(x, y + 1.2, z)), [w, h, k] = tier(d);
+      const opts = { pose: a.pose, face: a.face, look: a.eyeX, lookY: a.eyeY, blink: a.blink, phase: a.phase, hold: a.hold, give: a.give, light, sweat: a.sweat };
+      const key = `toy|${a.key}|${JSON.stringify(opts, (_k, v) => (typeof v === "number" ? q(v, 60) : v))}`;
+      const act = this.actor(ai++);
+      act.r = this.pool.req(key, w, h, k, (p) => drawToy(p, a.look, opts));
+      act.mesh.visible = true; act.mesh.position.set(x, y, z);
+      act.mesh.rotation.set(0, Math.atan2(cam.position.x - x, cam.position.z - z), a.lie ? -Math.PI / 2 : 0);
+      act.mesh.scale.set(1, 1, 1); act.mesh.castShadow = false;
+      if (a.shadow && !a.lie) fx.push({ key: "blob|contact|#5a5f86", cw: 128, ch: 128, draw: (p) => fxContact(p, "#5a5f86"), x, y: y + 0.02, z, w: 0.62, h: 0.46, flat: true });
     }
     for (let i = ai; i < this.actors.length; i++) this.actors[i].mesh.visible = false;
+    for (const cd of S.cards) {
+      const draw = CARD_DRAW[cd.kind]; if (!draw) continue;
+      const u = q(cd.u, 30);
+      fx.push({ key: `card|${cd.kind}|${u}`, cw: 256, ch: 256, draw: (p) => draw(p, u), x: cd.pos[0], y: cd.pos[1], z: cd.pos[2], w: cd.size, h: cd.size, rot: cd.rot });
+    }
+    if (S.set === "lawn") for (let k2 = 0; k2 < 7; k2++) {
+      const u = ((t * 0.9 + k2 / 7) % 1), hgt = 1.4 + 3.4 * Math.sin(Math.PI * u);
+      fx.push({ key: "spray", cw: 128, ch: 128, draw: spray, x: WH[0] + Math.cos(k2 * 2.4) * 0.4 * u, y: hgt, z: 34 + Math.sin(k2 * 2.4) * 0.4 * u, w: 1.1 + u * 0.8, h: 1.1 + u * 0.8, soft: true });
+    }
     let fi = 0;
     const used: Fx[] = [];
     for (const p of fx) {
       const e2 = this.fx(fi++);
-      e2.r = this.pool.req(p.key, p.cw, p.ch, 1, p.draw as unknown as (pp: never) => void);
-      e2.use(p.key === "spray");
+      e2.r = this.pool.req(p.key, p.cw, p.ch, 1, p.draw);
+      e2.use(!!p.soft);
       e2.mesh.visible = true; e2.mesh.position.set(p.x, p.y, p.z);
       if (p.flat) e2.mesh.rotation.set(-Math.PI / 2, 0, p.rot ?? 0);
       else { e2.mesh.quaternion.copy(cam.quaternion); e2.mesh.rotateZ(p.rot ?? 0); }
@@ -451,3 +549,32 @@ const spray = (p: Pen) => {
   g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
 };
 export { ctex };
+
+const pinballTex = () => ctex("l_pinField", 512, 960, (g) => {
+  const gr = g.createLinearGradient(0, 0, 0, 960); gr.addColorStop(0, "#1b1f5c"); gr.addColorStop(1, "#3a1b5c"); g.fillStyle = gr; g.fillRect(0, 0, 512, 960);
+  for (const [x, y, r, c] of [[150, 260, 52, "#ff5b8a"], [360, 230, 52, "#ffd447"], [256, 420, 58, "#5ed3ff"]] as const) { g.beginPath(); g.arc(x, y, r, 0, 7); g.fillStyle = c; g.fill(); g.lineWidth = 10; g.strokeStyle = "#ffffff"; g.stroke(); }
+  g.fillStyle = "#ffffff"; for (let i = 0; i < 9; i++) { g.beginPath(); g.arc(70 + i * 46, 600, 9, 0, 7); g.fill(); }
+  g.strokeStyle = "#ffd447"; g.lineWidth = 22; g.lineCap = "round"; g.beginPath(); g.moveTo(140, 830); g.lineTo(230, 880); g.moveTo(372, 830); g.lineTo(282, 880); g.stroke();
+  g.beginPath(); g.arc(300, 700, 18, 0, 7); g.fillStyle = "#e6e8ee"; g.fill();
+});
+const pinBackTex = () => ctex("l_pinBack", 512, 412, (g) => {
+  const gr = g.createLinearGradient(0, 0, 512, 412); gr.addColorStop(0, "#ff5b8a"); gr.addColorStop(1, "#7a2fbf"); g.fillStyle = gr; g.fillRect(0, 0, 512, 412);
+  g.font = "900 96px 'Arial Black', 'DejaVu Sans', sans-serif"; g.textAlign = "center"; g.lineWidth = 14; g.strokeStyle = "#1b1f5c"; g.strokeText("BALL!", 256, 180); g.fillStyle = "#ffd447"; g.fillText("BALL!", 256, 180);
+  g.fillStyle = "#1b1f5c"; g.fillRect(96, 250, 320, 90); g.fillStyle = "#ff5b3a"; g.font = "700 64px 'DejaVu Sans Mono', monospace"; g.fillText("0099500", 256, 318);
+});
+const posterTex = (k: number) => ctex("l_poster" + k, 400, 500, (g) => {
+  g.fillStyle = "#fbfaf4"; g.fillRect(0, 0, 400, 500); g.strokeStyle = "#3a6fd6"; g.lineWidth = 10; g.strokeRect(5, 5, 390, 490);
+  g.fillStyle = "#1e1a1d"; g.textAlign = "center";
+  if (k === 1) {
+    g.font = "900 46px 'Arial Black', 'DejaVu Sans', sans-serif"; g.fillStyle = "#e8333a"; g.fillText("HOW LONG", 200, 80); g.fillText("CAN YOU", 200, 132); g.fillText("STAY AWAKE?", 200, 184);
+    g.strokeStyle = "#1e1a1d"; g.lineWidth = 6; g.beginPath(); g.moveTo(60, 440); g.lineTo(60, 240); g.moveTo(60, 440); g.lineTo(350, 440); g.stroke();
+    g.strokeStyle = "#3a6fd6"; g.lineWidth = 8; g.beginPath(); g.moveTo(70, 260); for (let i = 1; i <= 8; i++) g.lineTo(70 + i * 34, 260 + i * i * 2.6); g.stroke();
+  } else {
+    for (let i = 0; i < 7; i++) { g.fillStyle = i % 3 === 0 ? "#3a6fd6" : "#9aa3b5"; g.fillRect(40, 60 + i * 56, 320 - (i % 2) * 80, 14); }
+    g.fillStyle = "#ffd447"; g.beginPath(); g.arc(200, 420, 46, 0, 7); g.fill(); g.font = "900 54px 'Arial Black', 'DejaVu Sans', sans-serif"; g.fillStyle = "#1e1a1d"; g.fillText(k ? "Z" : "?", 200, 440);
+  }
+});
+const clockTex = () => ctex("l_clock", 512, 512, (g) => {
+  g.fillStyle = "#fbf6ea"; g.beginPath(); g.arc(256, 256, 250, 0, 7); g.fill();
+  g.fillStyle = "#1e1a1d"; for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2; g.save(); g.translate(256 + Math.sin(a) * 210, 256 - Math.cos(a) * 210); g.rotate(a); g.fillRect(-7, -22, 14, i % 3 ? 26 : 44); g.restore(); }
+});

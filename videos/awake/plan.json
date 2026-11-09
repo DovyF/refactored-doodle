@@ -1,0 +1,588 @@
+{
+ "id": "awake",
+ "title": "What if you stayed awake for 11 days?",
+ "voice": {
+  "name": "am_michael",
+  "speed": 1.2
+ },
+ "cast": {
+  "you": "you-pj",
+  "friend": "friend",
+  "friend2": "friend2",
+  "scientist": "scientist",
+  "older": "you-old"
+ },
+ "lines": [
+  {
+   "text": "Stay awake for eleven days, and your brain starts sleeping without telling you.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "close:you",
+   "music": "dream",
+   "props": [
+    "clock"
+   ],
+   "clock": 2,
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "days",
+     "text": "11 DAYS"
+    },
+    {
+     "on": "sleeping",
+     "actor": "you",
+     "face": "asleep"
+    },
+    {
+     "on": "sleeping",
+     "card": "zzz",
+     "at": "you",
+     "sfx": "snore"
+    },
+    {
+     "on": "telling",
+     "actor": "you",
+     "face": "shock"
+    },
+    {
+     "on": "telling",
+     "kick": 0.7,
+     "sfx": "boing"
+    }
+   ]
+  },
+  {
+   "text": "You're seventeen. It's nineteen sixty-three. And for a science fair, you're going to try it.",
+   "set": "dining",
+   "shot": "mid:you",
+   "music": "march",
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "stand",
+     "face": "smile"
+    }
+   },
+   "beats": [
+    {
+     "on": "start",
+     "flash": true
+    },
+    {
+     "on": "you're",
+     "text": "AGE 17"
+    },
+    {
+     "on": "it's",
+     "text": "1963"
+    },
+    {
+     "on": "science",
+     "prop": "poster",
+     "sfx": "pop"
+    },
+    {
+     "on": "science",
+     "text": "SCIENCE FAIR"
+    },
+    {
+     "on": "fair",
+     "actor": "you",
+     "pose": "point",
+     "face": "grin"
+    },
+    {
+     "on": "try",
+     "actor": "you",
+     "pose": "cheer",
+     "face": "laugh"
+    }
+   ]
+  },
+  {
+   "text": "Night one is easy. Your friends poke you every time you blink.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "wide",
+   "props": [
+    "clock"
+   ],
+   "clock": 6,
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "smile"
+    },
+    "friend": {
+     "at": "bed.right",
+     "face": "grin"
+    },
+    "friend2": {
+     "at": "bed.left",
+     "face": "smile"
+    }
+   },
+   "beats": [
+    {
+     "on": "night",
+     "text": "NIGHT 1"
+    },
+    {
+     "on": "easy",
+     "actor": "you",
+     "pose": "cheer",
+     "face": "grin"
+    },
+    {
+     "on": "poke",
+     "actor": "friend",
+     "pose": "point",
+     "face": "laugh"
+    },
+    {
+     "on": "poke",
+     "actor": "friend2",
+     "pose": "point",
+     "face": "laugh"
+    },
+    {
+     "on": "poke",
+     "actor": "you",
+     "pose": "sit",
+     "face": "sleepy"
+    },
+    {
+     "on": "blink",
+     "actor": "you",
+     "face": "shock"
+    },
+    {
+     "on": "blink",
+     "card": "exclaim",
+     "at": "you",
+     "sfx": "boing"
+    },
+    {
+     "on": "blink",
+     "shot": "close:you",
+     "kick": 0.6
+    }
+   ]
+  },
+  {
+   "text": "Day three, you can't remember what you said thirty seconds ago.",
+   "set": "dining",
+   "shot": "mid:you",
+   "props": [
+    "poster"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "stand",
+     "face": "sleepy",
+     "hold": "coffee"
+    },
+    "friend": {
+     "at": "table.right",
+     "face": "neutral",
+     "eye": -1
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 3"
+    },
+    {
+     "on": "remember",
+     "actor": "you",
+     "face": "think"
+    },
+    {
+     "on": "remember",
+     "card": "qmark",
+     "at": "you",
+     "sfx": "boing"
+    },
+    {
+     "on": "seconds",
+     "shot": "close:you"
+    },
+    {
+     "on": "ago",
+     "actor": "you",
+     "face": "dazed"
+    }
+   ]
+  },
+  {
+   "text": "Then you get moody. Then paranoid. Then you start seeing things that aren't there.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "mid:you",
+   "music": "tense",
+   "props": [
+    "clock"
+   ],
+   "clock": 10,
+   "actors": {
+    "you": {
+     "at": "floor",
+     "pose": "stand",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "moody",
+     "actor": "you",
+     "face": "stern"
+    },
+    {
+     "on": "moody",
+     "card": "anger",
+     "at": "you",
+     "sfx": "thud"
+    },
+    {
+     "on": "paranoid",
+     "actor": "you",
+     "face": "nervous",
+     "eye": -1,
+     "pose": "shrug"
+    },
+    {
+     "on": "paranoid",
+     "shot": "close:you",
+     "sfx": "scratch"
+    },
+    {
+     "on": "seeing",
+     "actor": "you",
+     "face": "wide",
+     "eye": 1,
+     "pose": "stand"
+    },
+    {
+     "on": "seeing",
+     "card": "critter",
+     "at": "you",
+     "sfx": "wobble"
+    },
+    {
+     "on": "things",
+     "card": "critter",
+     "at": "you"
+    },
+    {
+     "on": "there",
+     "shot": "mid:you"
+    }
+   ]
+  },
+  {
+   "text": "Day ten, you beat a Stanford sleep scientist at pinball.",
+   "set": "office",
+   "shot": "mid:you",
+   "music": "march",
+   "props": [
+    "pinball"
+   ],
+   "actors": {
+    "you": {
+     "at": "pinball",
+     "face": "sleepy"
+    },
+    "scientist": {
+     "at": "pinball.side",
+     "face": "smug"
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 10"
+    },
+    {
+     "on": "beat",
+     "actor": "you",
+     "pose": "cheer",
+     "face": "laugh"
+    },
+    {
+     "on": "beat",
+     "card": "stars",
+     "at": "you",
+     "sfx": "pinball"
+    },
+    {
+     "on": "scientist",
+     "shot": "two:you,scientist"
+    },
+    {
+     "on": "scientist",
+     "actor": "scientist",
+     "face": "shock"
+    },
+    {
+     "on": "pinball",
+     "kick": 0.5,
+     "sfx": "ding"
+    }
+   ]
+  },
+  {
+   "text": "Day eleven, they ask you to count back from a hundred by sevens. You get to sixty-five... and forget what you were doing.",
+   "set": "office",
+   "shot": "two:you,scientist",
+   "actors": {
+    "you": {
+     "at": "desk",
+     "face": "sleepy"
+    },
+    "scientist": {
+     "at": "desk.side",
+     "face": "stern",
+     "hold": "paper"
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 11"
+    },
+    {
+     "on": "ask",
+     "actor": "scientist",
+     "give": "paper"
+    },
+    {
+     "on": "count",
+     "text": "100\u2026 93\u2026",
+     "where": "middle",
+     "sfx": "tick"
+    },
+    {
+     "on": "back",
+     "text": "86\u2026 79\u2026",
+     "where": "middle",
+     "sfx": "tick"
+    },
+    {
+     "on": "get",
+     "text": "72\u2026 65\u2026",
+     "where": "middle",
+     "sfx": "tick"
+    },
+    {
+     "on": "get",
+     "shot": "close:you",
+     "actor": "you",
+     "face": "think"
+    },
+    {
+     "on": "forget",
+     "actor": "you",
+     "face": "dazed"
+    },
+    {
+     "on": "forget",
+     "card": "qmark",
+     "at": "you",
+     "sfx": "boing"
+    },
+    {
+     "on": "forget",
+     "text": "\u2026?",
+     "where": "middle"
+    }
+   ]
+  },
+  {
+   "text": "Wait... how do you win at pinball, but lose at counting?",
+   "set": "office",
+   "shot": "close:you",
+   "music": "stop",
+   "actors": {
+    "you": {
+     "at": "desk",
+     "face": "shock"
+    }
+   },
+   "beats": [
+    {
+     "on": "wait",
+     "kick": 0.9,
+     "sfx": "scratch"
+    },
+    {
+     "on": "win",
+     "card": "stars",
+     "at": "you"
+    },
+    {
+     "on": "counting",
+     "actor": "you",
+     "face": "nervous",
+     "sweat": true
+    }
+   ]
+  },
+  {
+   "text": "You see, a tired brain cheats. Little groups of brain cells take secret naps while the rest of you stays awake, like a store turning off its lights one aisle at a time.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "mid:you",
+   "music": "soft",
+   "props": [
+    "clock"
+   ],
+   "actors": {
+    "you": {
+     "at": "floor",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "brain",
+     "brain": 6,
+     "sfx": "ding"
+    },
+    {
+     "on": "naps",
+     "actor": "you",
+     "face": "asleep"
+    },
+    {
+     "on": "naps",
+     "card": "zzz",
+     "at": "you",
+     "sfx": "snore"
+    },
+    {
+     "on": "awake",
+     "actor": "you",
+     "face": "sleepy"
+    },
+    {
+     "on": "store",
+     "shot": "close:you"
+    },
+    {
+     "on": "lights",
+     "sfx": "click"
+    },
+    {
+     "on": "aisle",
+     "sfx": "click"
+    }
+   ]
+  },
+  {
+   "text": "You finally sleep fourteen hours and wake up fine. Guinness doesn't even track this record anymore. It's too dangerous.",
+   "set": "bedroom",
+   "light": "int",
+   "shot": "wide",
+   "music": "march",
+   "props": [
+    "clock"
+   ],
+   "clock": 14,
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "asleep",
+     "lie": true
+    }
+   },
+   "beats": [
+    {
+     "on": "sleep",
+     "card": "zzz",
+     "at": "you",
+     "sfx": "snore"
+    },
+    {
+     "on": "hours",
+     "text": "14 HOURS"
+    },
+    {
+     "on": "wake",
+     "actor": "you",
+     "lie": false,
+     "pose": "cheer",
+     "face": "grin",
+     "sfx": "ding"
+    },
+    {
+     "on": "wake",
+     "shot": "mid:you"
+    },
+    {
+     "on": "guinness",
+     "icon": "book",
+     "sfx": "pop"
+    },
+    {
+     "on": "dangerous",
+     "stamp": "TOO DANGEROUS",
+     "sfx": "stamp",
+     "kick": 0.9
+    }
+   ]
+  },
+  {
+   "text": "And decades later, the kid who stayed awake for eleven days... couldn't fall asleep.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "wide",
+   "music": "dream",
+   "props": [
+    "clock"
+   ],
+   "clock": 6,
+   "actors": {
+    "older": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "decades",
+     "text": "DECADES LATER"
+    },
+    {
+     "on": "kid",
+     "shot": "mid:older"
+    },
+    {
+     "on": "couldn't",
+     "actor": "older",
+     "face": "wide"
+    },
+    {
+     "on": "couldn't",
+     "shot": "close:older",
+     "sfx": "tick"
+    },
+    {
+     "on": "asleep",
+     "sfx": "tick"
+    }
+   ]
+  }
+ ]
+}
