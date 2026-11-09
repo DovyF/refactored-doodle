@@ -59,14 +59,17 @@
    ]
   },
   {
-   "text": "You're seventeen. It's nineteen sixty-three. And for a science fair, you're going to try it.",
+   "text": "It's nineteen sixty-three. You're seventeen. You lose a coin toss, so you're the one who stays awake.",
    "set": "dining",
-   "shot": "mid:you",
+   "shot": "two:you,friend",
    "music": "march",
    "actors": {
     "you": {
-     "at": "table",
-     "pose": "stand",
+     "at": "table.left",
+     "face": "smile"
+    },
+    "friend": {
+     "at": "table.right",
      "face": "smile"
     }
    },
@@ -76,38 +79,48 @@
      "flash": true
     },
     {
-     "on": "you're",
-     "text": "AGE 17"
-    },
-    {
-     "on": "it's",
+     "on": "nineteen",
      "text": "1963"
     },
     {
-     "on": "science",
-     "prop": "poster",
-     "sfx": "pop"
+     "on": "seventeen",
+     "text": "AGE 17"
     },
     {
-     "on": "science",
-     "text": "SCIENCE FAIR"
+     "on": "coin",
+     "card": "stars",
+     "at": "friend",
+     "sfx": "coin"
     },
     {
-     "on": "fair",
-     "actor": "you",
-     "pose": "point",
-     "face": "grin"
-    },
-    {
-     "on": "try",
-     "actor": "you",
+     "on": "lose",
+     "actor": "friend",
      "pose": "cheer",
      "face": "laugh"
+    },
+    {
+     "on": "lose",
+     "actor": "you",
+     "face": "shock"
+    },
+    {
+     "on": "lose",
+     "card": "cross",
+     "at": "you",
+     "sfx": "boing"
+    },
+    {
+     "on": "stays",
+     "shot": "high:you",
+     "actor": "you",
+     "pose": "facepalm",
+     "face": "sad",
+     "kick": 0.5
     }
    ]
   },
   {
-   "text": "Night one is easy. Your friends poke you every time you blink.",
+   "text": "Night one, easy. Your friends poke you every time you blink.",
    "set": "bedroom",
    "light": "night",
    "shot": "wide",
@@ -172,22 +185,19 @@
     },
     {
      "on": "blink",
-     "shot": "close:you",
+     "shot": "snap:you",
      "kick": 0.6
     }
    ]
   },
   {
-   "text": "Day three, you can't remember what you said thirty seconds ago.",
+   "text": "Day three, you're moody. Day four, you're sure you're a famous football player.",
    "set": "dining",
    "shot": "mid:you",
-   "props": [
-    "poster"
-   ],
+   "music": "tense",
    "actors": {
     "you": {
      "at": "table",
-     "pose": "stand",
      "face": "sleepy",
      "hold": "coffee"
     },
@@ -203,49 +213,9 @@
      "text": "DAY 3"
     },
     {
-     "on": "remember",
-     "actor": "you",
-     "face": "think"
-    },
-    {
-     "on": "remember",
-     "card": "qmark",
-     "at": "you",
-     "sfx": "boing"
-    },
-    {
-     "on": "seconds",
-     "shot": "close:you"
-    },
-    {
-     "on": "ago",
-     "actor": "you",
-     "face": "dazed"
-    }
-   ]
-  },
-  {
-   "text": "Then you get moody. Then paranoid. Then you start seeing things that aren't there.",
-   "set": "bedroom",
-   "light": "night",
-   "shot": "mid:you",
-   "music": "tense",
-   "props": [
-    "clock"
-   ],
-   "clock": 10,
-   "actors": {
-    "you": {
-     "at": "floor",
-     "pose": "stand",
-     "face": "sleepy"
-    }
-   },
-   "beats": [
-    {
      "on": "moody",
      "actor": "you",
-     "face": "stern"
+     "face": "angry"
     },
     {
      "on": "moody",
@@ -254,45 +224,101 @@
      "sfx": "thud"
     },
     {
-     "on": "paranoid",
+     "on": "day#2",
+     "text": "DAY 4"
+    },
+    {
+     "on": "sure",
+     "shot": "low:you"
+    },
+    {
+     "on": "famous",
      "actor": "you",
-     "face": "nervous",
-     "eye": -1,
+     "pose": "cheer",
+     "face": "proud",
+     "hold": null
+    },
+    {
+     "on": "football",
+     "icon": "trophy",
+     "sfx": "fanfare"
+    },
+    {
+     "on": "player",
+     "actor": "friend",
+     "face": "shock",
      "pose": "shrug"
     },
     {
-     "on": "paranoid",
-     "shot": "close:you",
-     "sfx": "scratch"
+     "on": "player",
+     "card": "qmark",
+     "at": "friend"
     },
     {
-     "on": "seeing",
+     "on": "player",
+     "sfx": "crowd"
+    },
+    {
+     "on": "player",
+     "shot": "two:you,friend"
+    }
+   ]
+  },
+  {
+   "text": "Day five, you see a forest where your house should be.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "dutch:you",
+   "props": [
+    "clock"
+   ],
+   "clock": 10,
+   "actors": {
+    "you": {
+     "at": "floor",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 5"
+    },
+    {
+     "on": "see",
      "actor": "you",
      "face": "wide",
-     "eye": 1,
-     "pose": "stand"
+     "eye": 1
     },
     {
-     "on": "seeing",
+     "on": "forest",
      "card": "critter",
      "at": "you",
      "sfx": "wobble"
     },
     {
-     "on": "things",
+     "on": "forest",
+     "shot": "close:you",
+     "kick": 0.4
+    },
+    {
+     "on": "house",
      "card": "critter",
      "at": "you"
     },
     {
-     "on": "there",
-     "shot": "mid:you"
+     "on": "should",
+     "actor": "you",
+     "face": "panic",
+     "eye": -1,
+     "sweat": true
     }
    ]
   },
   {
    "text": "Day ten, you beat a Stanford sleep scientist at pinball.",
    "set": "office",
-   "shot": "mid:you",
+   "shot": "orbit:you",
    "music": "march",
    "props": [
     "pinball"
@@ -341,7 +367,7 @@
    ]
   },
   {
-   "text": "Day eleven, they ask you to count back from a hundred by sevens. You get to sixty-five... and forget what you were doing.",
+   "text": "Day eleven: count back from a hundred by sevens. You reach sixty-five... and forget what you were doing.",
    "set": "office",
    "shot": "two:you,scientist",
    "actors": {
@@ -361,30 +387,30 @@
      "text": "DAY 11"
     },
     {
-     "on": "ask",
+     "on": "count",
      "actor": "scientist",
      "give": "paper"
     },
     {
      "on": "count",
-     "text": "100\u2026 93\u2026",
+     "text": "100… 93…",
      "where": "middle",
      "sfx": "tick"
     },
     {
-     "on": "back",
-     "text": "86\u2026 79\u2026",
+     "on": "hundred",
+     "text": "86… 79…",
      "where": "middle",
      "sfx": "tick"
     },
     {
-     "on": "get",
-     "text": "72\u2026 65\u2026",
+     "on": "reach",
+     "text": "72… 65…",
      "where": "middle",
      "sfx": "tick"
     },
     {
-     "on": "get",
+     "on": "reach",
      "shot": "close:you",
      "actor": "you",
      "face": "think"
@@ -392,7 +418,7 @@
     {
      "on": "forget",
      "actor": "you",
-     "face": "dazed"
+     "face": "blank"
     },
     {
      "on": "forget",
@@ -402,13 +428,13 @@
     },
     {
      "on": "forget",
-     "text": "\u2026?",
+     "text": "…?",
      "where": "middle"
     }
    ]
   },
   {
-   "text": "Wait... how do you win at pinball, but lose at counting?",
+   "text": "Wait... you win at pinball, but lose to counting?",
    "set": "office",
    "shot": "close:you",
    "music": "stop",
@@ -422,7 +448,7 @@
     {
      "on": "wait",
      "kick": 0.9,
-     "sfx": "scratch"
+     "sfx": "hit"
     },
     {
      "on": "win",
@@ -438,7 +464,7 @@
    ]
   },
   {
-   "text": "You see, a tired brain cheats. Little groups of brain cells take secret naps while the rest of you stays awake, like a store turning off its lights one aisle at a time.",
+   "text": "You see, a tired brain cheats. Tiny groups of brain cells nap while you're awake, like a store switching off one aisle at a time.",
    "set": "bedroom",
    "light": "night",
    "shot": "mid:you",
@@ -459,12 +485,12 @@
      "sfx": "ding"
     },
     {
-     "on": "naps",
+     "on": "nap",
      "actor": "you",
      "face": "asleep"
     },
     {
-     "on": "naps",
+     "on": "nap",
      "card": "zzz",
      "at": "you",
      "sfx": "snore"
@@ -479,7 +505,7 @@
      "shot": "close:you"
     },
     {
-     "on": "lights",
+     "on": "switching",
      "sfx": "click"
     },
     {
@@ -489,7 +515,7 @@
    ]
   },
   {
-   "text": "You finally sleep fourteen hours and wake up fine. Guinness doesn't even track this record anymore. It's too dangerous.",
+   "text": "You sleep fourteen hours and wake up fine. Guinness stopped tracking the record. Too dangerous.",
    "set": "bedroom",
    "light": "int",
    "shot": "wide",
@@ -527,7 +553,7 @@
     },
     {
      "on": "wake",
-     "shot": "mid:you"
+     "shot": "low:you"
     },
     {
      "on": "guinness",
@@ -543,7 +569,7 @@
    ]
   },
   {
-   "text": "And decades later, the kid who stayed awake for eleven days... couldn't fall asleep.",
+   "text": "And decades later, the kid who stayed awake eleven days... can't fall asleep.",
    "set": "bedroom",
    "light": "night",
    "shot": "wide",
@@ -566,15 +592,15 @@
     },
     {
      "on": "kid",
-     "shot": "mid:older"
+     "shot": "high:older"
     },
     {
-     "on": "couldn't",
+     "on": "can't",
      "actor": "older",
      "face": "wide"
     },
     {
-     "on": "couldn't",
+     "on": "can't",
      "shot": "close:older",
      "sfx": "tick"
     },
@@ -584,5 +610,12 @@
     }
    ]
   }
+ ],
+ "sources": [
+  "NPR 2017 (Randy Gardner, later insomnia)",
+  "Wikipedia: Randy Gardner's sleep deprivation experiment (pinball, serial sevens at 65, 14 h sleep)",
+  "IFLScience 2024: coin toss; day 3 moody; day 4 Paul Lowe delusion; day 5 forest path (Ross 1965)",
+  "Guinness stopped the category (danger)",
+  "Nature 2011 (Vyazovskiy): local sleep in awake rats"
  ]
 }

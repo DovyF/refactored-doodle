@@ -30,7 +30,9 @@ jobs:
       - uses: actions/cache@v4
         with: { path: ~/.cache/huggingface, key: whisper-base-en }
       - name: Voice + word timings
-        run: mkdir -p work && python scripts/make_voice.py "${{ inputs.plan }}" models work
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg > /dev/null
+          mkdir -p work && python scripts/make_voice.py "${{ inputs.plan }}" models work
       - name: Music + sound effects
         run: python scripts/make_sound.py "${{ inputs.plan }}" work
       - name: Props for the renderer

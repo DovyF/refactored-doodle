@@ -255,12 +255,23 @@ export class Timeline {
       const mid = mulv(add(A.pos, B.pos), 0.5), d = Math.hypot(A.pos[0] - B.pos[0], A.pos[2] - B.pos[2]);
       [pos, look] = dolly(add(mid, add(mulv(front, 3.8 + 1.0 * d), [0, 1.45, 0])), add(mid, [0, 1.0, 0]), pushK(x, 0.002)); fov = 46; dof = 4; focus = add(mid, [0, 1.4, 0]);
     } else {
-      const S = this.subject(seg.line, seg.a, arg), h = S.head;
-      if (kind === "close") { [pos, look] = dolly(add(h, add(mulv(front, 2.75), add(mulv(right, 0.24), [0, 0.04, 0]))), add(h, [0, -0.24, 0]), pushK(x, 0.003)); fov = 38; dof = 13; }
-      else { [pos, look] = dolly(add(h, add(mulv(front, 4.1), add(mulv(right, 0.4), [0, -0.1, 0]))), add(h, [0, S.pose === "sit" || S.lie ? -0.45 : -0.62, 0]), pushK(x, 0.0022)); fov = 44; dof = 7; }
+      const S = this.subject(seg.line, seg.a, arg), h = S.head, sideK = seg.idx % 2 ? -1 : 1;
+      const lowY = S.pose === "sit" || S.lie ? -0.45 : -0.62;
+      if (kind === "low") { // hero / triumph: camera at chest height looking up
+        [pos, look] = dolly(add(h, add(mulv(front, 3.3), add(mulv(right, 0.35 * sideK), [0, -1.05, 0]))), add(h, [0, -0.05, 0]), pushK(x, 0.0022)); fov = 46; dof = 6;
+      } else if (kind === "high") { // small / overwhelmed: camera above looking down
+        [pos, look] = dolly(add(h, add(mulv(front, 2.7), add(mulv(right, 0.3 * sideK), [0, 1.75, 0]))), add(h, [0, -0.55, 0]), pushK(x, 0.0022)); fov = 44; dof = 6;
+      } else if (kind === "orbit") { // slow arc around the subject across the shot
+        const th = (-0.32 + Math.min(x, 150) * 0.0042) * sideK, dir = add(mulv(front, Math.cos(th)), mulv(right, Math.sin(th)));
+        pos = add(h, add(mulv(dir, 3.6), [0, 0.0, 0])); look = add(h, [0, lowY * 0.7, 0]); fov = 44; dof = 7;
+      } else if (kind === "snap") { // crash zoom: mid -> close in 6 frames
+        const u = smooth(x / 6), d = 4.1 + (2.6 - 4.1) * u;
+        pos = add(h, add(mulv(front, d), add(mulv(right, 0.3), [0, 0.0, 0]))); look = add(h, [0, lowY + (0.38) * u, 0]); fov = 44 - 6 * u; dof = 7 + 6 * u;
+      } else if (kind === "close") { [pos, look] = dolly(add(h, add(mulv(front, 2.75), add(mulv(right, 0.24), [0, 0.04, 0]))), add(h, [0, -0.24, 0]), pushK(x, 0.003)); fov = 38; dof = 13; }
+      else { [pos, look] = dolly(add(h, add(mulv(front, 4.1), add(mulv(right, 0.4 * sideK), [0, -0.1, 0]))), add(h, [0, lowY, 0]), pushK(x, 0.0022)); fov = 44; dof = 7; }
       focus = h;
     }
-    let cam: Cam = { pos, look, fov, roll: kind === "close" ? roll : 0 };
+    let cam: Cam = { pos, look, fov, roll: kind === "close" ? roll : kind === "dutch" ? roll * 4 : 0 };
     // impact kicks: the view flips sign every frame and decays over 7 frames
     let k = 0; for (const [f0, g] of this.kicks) { const n = f - f0; if (n >= 0 && n < 7) k += g * (n % 2 ? -1 : 1) * (1 - n / 7) ** 1.5; }
     if (k) { const d = sub(cam.look, cam.pos), L = Math.hypot(...d), hh = Math.hypot(d[0], d[2]) || 1, m = (3 / 640) * Math.tan((cam.fov * Math.PI) / 360) * L * k;

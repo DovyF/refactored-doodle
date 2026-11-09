@@ -5,7 +5,7 @@ import { Pen, INK, mul, thickAngle } from "../videos/bridge/toon";
 
 type P2 = [number, number];
 export type Face = "neutral" | "smile" | "grin" | "laugh" | "shock" | "nervous" | "strain" | "stern" | "sleepy" | "dazed" | "sad"
-  | "smug" | "asleep" | "wide" | "think";
+  | "smug" | "asleep" | "wide" | "think" | "angry" | "cry" | "sus" | "love" | "yawn" | "proud" | "panic" | "blank";
 export type Pose = "stand" | "walk" | "sit" | "lie" | "wave" | "point" | "push" | "shrug" | "cheer" | "think" | "facepalm";
 export type Thing = "phone" | "keys" | "card" | "folder" | "coffee" | "paper" | "pencil";
 export type ToyLook = {
@@ -50,7 +50,7 @@ export const drawThing = (p: Pen, kind: Thing, x: number, y: number, s = 1) => {
 };
 
 // ---------------- faces ----------------
-type FaceDef = { eye: "open" | "squeeze" | "happy" | "closed" | "spiral"; lid: number; pupil: number; size: number; brow: [number, number]; mouth: string };
+type FaceDef = { eye: "open" | "squeeze" | "happy" | "closed" | "spiral" | "heart" | "dot"; lid: number; pupil: number; size: number; brow: [number, number]; mouth: string };
 const FACES: Record<Face, FaceDef> = {
   neutral: { eye: "open", lid: 0.08, pupil: 16, size: 1, brow: [0, 0], mouth: "line" },
   smile: { eye: "open", lid: 0.1, pupil: 16, size: 1, brow: [-4, -2], mouth: "smile" },
@@ -67,6 +67,14 @@ const FACES: Record<Face, FaceDef> = {
   asleep: { eye: "closed", lid: 1, pupil: 0, size: 1, brow: [0, 4], mouth: "o" },
   wide: { eye: "open", lid: 0, pupil: 7, size: 1.25, brow: [-20, -14], mouth: "line" },
   think: { eye: "open", lid: 0.25, pupil: 14, size: 1, brow: [-12, 8], mouth: "smirk" },
+  angry: { eye: "open", lid: 0.38, pupil: 14, size: 0.95, brow: [24, -10], mouth: "teeth" },
+  cry: { eye: "open", lid: 0.3, pupil: 14, size: 1, brow: [-16, 10], mouth: "frown" },
+  sus: { eye: "open", lid: 0.56, pupil: 13, size: 0.95, brow: [10, -2], mouth: "line" },
+  love: { eye: "heart", lid: 0, pupil: 0, size: 1.05, brow: [-10, -6], mouth: "smile" },
+  yawn: { eye: "closed", lid: 1, pupil: 0, size: 1, brow: [-8, 6], mouth: "yawn" },
+  proud: { eye: "happy", lid: 0, pupil: 0, size: 1, brow: [-6, -12], mouth: "smile" },
+  panic: { eye: "open", lid: 0, pupil: 6, size: 1.22, brow: [-24, -10], mouth: "teeth" },
+  blank: { eye: "dot", lid: 0, pupil: 0, size: 1, brow: [0, 0], mouth: "small" },
 };
 const MOUTH = "#6a1f2c", TONGUE = "#ea7480";
 const mouthAt = (p: Pen, kind: string, x: number, y: number) => {
@@ -78,6 +86,7 @@ const mouthAt = (p: Pen, kind: string, x: number, y: number) => {
     case "frown": p.arc(x, y + 14, 24, 13, 200, 340, 8); break;
     case "wave": { const s: P2[] = []; for (let i = 0; i <= 12; i++) s.push([x - 26 + i * 4.4, y + 5 * Math.sin(i * 1.3)]); p.stroke(s, 7); break; }
     case "o": p.ell(x, y + 2, 10, 12, MOUTH, 5); break;
+    case "yawn": p.ell(x, y + 10, 24, 40, MOUTH, 7); p.ell(x, y + 34, 13, 9, TONGUE, 0); break;
     case "O": p.ell(x, y + 6, 26, 32, MOUTH, 7); p.ell(x, y + 24, 14, 10, TONGUE, 0); break;
     case "grin": p.ell(x, y - 6, 40, 30, MOUTH, 0, 0, 180); p.clip(ellPts(x, y - 6, 40, 30, 24, 0, 180), () => p.poly([[x - 40, y - 6], [x + 40, y - 6], [x + 40, y + 5], [x - 40, y + 5]], "#ffffff", 0)); p.ell(x, y - 6, 40, 30, null, 7, 0, 180); p.stroke([[x - 40, y - 6], [x + 40, y - 6]], 7); break;
     case "laugh": p.ell(x, y - 8, 50, 44, MOUTH, 0, 0, 180); p.ell(x, y + 20, 22, 12, TONGUE, 0); p.clip(ellPts(x, y - 8, 50, 44, 24, 0, 180), () => p.poly([[x - 50, y - 8], [x + 50, y - 8], [x + 50, y + 6], [x - 50, y + 6]], "#ffffff", 0)); p.ell(x, y - 8, 50, 44, null, 7, 0, 180); p.stroke([[x - 50, y - 8], [x + 50, y - 8]], 7); break;
@@ -100,6 +109,8 @@ const drawFace = (p: Pen, L: ToyLook, o: ToyOpts, hx: number, hy: number) => {
       if (blink > 0.05) p.stroke([[x - rx + 4, ey - ry + 2 * ry * blink], [x + rx - 4, ey - ry + 2 * ry * blink]], 6);
     } else if (F.eye === "squeeze") p.stroke([[x - side * 26, ey - 22], [x + side * 18, ey], [x - side * 26, ey + 22]], 9);
     else if (F.eye === "happy") p.arc(x, ey + 10, 30, 22, 200, 340, 9);
+    else if (F.eye === "heart") p.poly([[x, ey + 34], [x - 38, ey - 2], [x - 30, ey - 30], [x - 12, ey - 34], [x, ey - 18], [x + 12, ey - 34], [x + 30, ey - 30], [x + 38, ey - 2]], "#ff4d6d", 6);
+    else if (F.eye === "dot") p.dot(x, ey + 4, 11);
     else if (F.eye === "spiral") { p.ell(x, ey, rx, ry, "#ffffff", 6); const s: P2[] = []; for (let t = 1; t < 26; t++) s.push([x + Math.cos(t * 0.75) * t * 1.35, ey + Math.sin(t * 0.75) * t * 1.35]); p.stroke(s, 4.5); }
     else p.arc(x, ey + 4, 30, 14, 20, 160, 8); // closed / blink
     if (L.bags || o.face === "sleepy" || o.face === "wide") p.arc(x, ey + ry * 0.8, rx * 0.7, 10, 20, 160, 4, "rgba(110,80,140,0.75)");
@@ -111,7 +122,8 @@ const drawFace = (p: Pen, L: ToyLook, o: ToyOpts, hx: number, hy: number) => {
   p.ell(hx - 108, hy + 62, 24, 13, "rgba(255,140,140,0.55)", 0); p.ell(hx + 108, hy + 62, 24, 13, "rgba(255,140,140,0.55)", 0);
   if (L.beard) p.poly(ellPts(hx, hy + 100, 82, 52, 32, 0, 180), L.beard, 6);
   mouthAt(p, F.mouth, hx, hy + 78);
-  if (o.sweat || o.face === "nervous" || o.face === "strain") { p.poly([[hx + 150, hy - 80], [hx + 162, hy - 52], [hx + 150, hy - 42], [hx + 138, hy - 52]], "#9fd8ff", 4); }
+  if (o.face === "cry") for (const x of ex) p.poly([[x - 12, ey + 40], [x + 12, ey + 40], [x + 16, ey + 150], [x - 16, ey + 150]], "rgba(140,205,255,0.85)", 4);
+  if (o.sweat || o.face === "nervous" || o.face === "strain" || o.face === "panic") { p.poly([[hx + 150, hy - 80], [hx + 162, hy - 52], [hx + 150, hy - 42], [hx + 138, hy - 52]], "#9fd8ff", 4); }
 };
 
 // ---------------- hats + hair ----------------
