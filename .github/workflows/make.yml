@@ -34,7 +34,8 @@ jobs:
       - name: Music + sound effects
         run: python scripts/make_sound.py "${{ inputs.plan }}" work
       - name: Props for the renderer
-        run: python -c "import json; json.dump({'plan': json.load(open('${{ inputs.plan }}')), 'words': json.load(open('work/words.json'))}, open('work/props.json', 'w'))"
+        run: |
+          python -c "import json; json.dump({'plan': json.load(open('${{ inputs.plan }}')), 'words': json.load(open('work/words.json'))}, open('work/props.json', 'w'))"
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - uses: actions/cache@v4
