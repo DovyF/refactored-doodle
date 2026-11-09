@@ -11,7 +11,7 @@ import { World } from "./world";
 import { InkPass, noInkFallback } from "../videos/bridge/ink";
 import { LensBlur } from "../videos/bridge/lensblur";
 import { GradeEffect, GRADES, GRADE_STRENGTH, gradeFor } from "../videos/bridge/grade";
-import { Timeline, Plan, Word, Overlay, FPS } from "./plan";
+import { Timeline, Plan, Word, Overlay, FPS, SLOT_Y } from "./plan";
 
 export type PlanProps = { plan: Plan; words: Word[] };
 export const planFrames = (words: Word[]) => Math.round((words[words.length - 1].e + 0.6) * FPS);
@@ -49,7 +49,7 @@ const Inner: React.FC<{ tl: Timeline; segIdx: number }> = ({ tl, segIdx }) => {
   noInkFallback(world.root);
   cam.getWorldDirection(fwd); fpt.set(...st.focus);
   fx.lens.focus = Math.max(0.3, fpt.sub(cam.position).dot(fwd)); fx.lens.cInf = st.dof;
-  gradeFor(fx.grade, st.light === "golden" ? "golden" : "day");
+  gradeFor(fx.grade, st.light === "golden" ? "golden" : st.light === "night" ? "night" : "day");
   return (<><primitive object={world.root} dispose={null} />{post}</>);
 };
 
@@ -64,7 +64,6 @@ const View: React.FC<{ tl: Timeline; segIdx: number; alpha: number }> = ({ tl, s
 // ---------------- on-screen overlays ----------------
 const INK = "#241726";
 const pop = (n: number) => (n >= 7 ? 1 : 1 + 0.28 * Math.sin((n / 7) * Math.PI) * (1 - n / 7) + (n < 2 ? -0.35 + n * 0.17 : 0));
-const Y: Record<string, number> = { top: 150, middle: 860, bottom: 1450 };
 const ICONS: Record<string, React.ReactNode> = {
   book: (<g><rect x="30" y="40" width="140" height="120" rx="10" fill="#2f6fd6" stroke={INK} strokeWidth="9" /><rect x="44" y="52" width="112" height="96" rx="4" fill="#fbf6ea" stroke={INK} strokeWidth="5" /><path d="M100 52 V148" stroke={INK} strokeWidth="6" />{[70, 90, 110].map((y) => <path key={y} d={`M56 ${y} H90 M110 ${y} H144`} stroke="#9aa3b5" strokeWidth="5" />)}</g>),
   clock: (<g><circle cx="100" cy="100" r="74" fill="#fbf6ea" stroke={INK} strokeWidth="10" /><path d="M100 100 V52 M100 100 L136 120" stroke={INK} strokeWidth="10" strokeLinecap="round" /></g>),
@@ -81,15 +80,15 @@ const Brain: React.FC<{ n: number; off: number }> = ({ n, off }) => (
   </svg>
 );
 const OverlayView: React.FC<{ o: Overlay; f: number }> = ({ o, f }) => {
-  const n = f - o.f0, s = pop(n), y = Y[o.where] ?? 820;
-  const box: React.CSSProperties = { position: "absolute", left: 0, right: 0, top: y, display: "flex", justifyContent: "center", transform: `scale(${s})`, transformOrigin: "50% 0%" };
+  const n = f - o.f0, s = pop(n), y = o.y ?? SLOT_Y[o.where] ?? 820, x = o.x ?? 0;
+  const box: React.CSSProperties = { position: "absolute", left: x, right: -x, top: y, display: "flex", justifyContent: "center", transform: `scale(${s})`, transformOrigin: "50% 0%" };
   if (o.kind === "text") return (<div style={box}><div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 112, lineHeight: 1.0, color: "#ffffff", textAlign: "center", padding: "0 60px",
     WebkitTextStroke: `14px ${INK}`, paintOrder: "stroke fill", textShadow: "0 10px 0 rgba(36,23,38,0.35)", letterSpacing: 1 }}>{o.value}</div></div>);
-  if (o.kind === "icon") return (<div style={box}><svg width="360" height="360" viewBox="0 0 200 200">{ICONS[o.value] ?? null}</svg></div>);
+  if (o.kind === "icon") return (<div style={box}><svg width="300" height="300" viewBox="0 0 200 200">{ICONS[o.value] ?? null}</svg></div>);
   if (o.kind === "stamp") { const k = Math.min(1, n / 5); return (<div style={{ ...box, transform: `scale(${2.2 - 1.2 * k}) rotate(-11deg)`, opacity: k }}>
     <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 92, color: "#e8333a", border: "14px solid #e8333a", borderRadius: 18, padding: "10px 34px", background: "rgba(255,255,255,0.85)" }}>{o.value}</div></div>); }
   const total = o.f1 - o.f0, nOn = o.n ?? 6, off = Math.min(nOn, Math.floor((n / Math.max(1, total * 0.85)) * (nOn + 1)));
-  return (<div style={{ ...box, top: 70, transform: `scale(${0.72 * s})` }}><Brain n={nOn} off={off} /></div>);
+  return (<div style={{ ...box, transform: `scale(${0.72 * s})` }}><Brain n={nOn} off={off} /></div>);
 };
 
 const useFont = () => {

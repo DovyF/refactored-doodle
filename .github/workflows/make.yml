@@ -1,13 +1,13 @@
 # One click from a plan to a finished video. The plan (videos/<id>/plan.json) is the only thing a "brain" writes.
 #   prepare: voice (Kokoro) + word timings (Whisper) + music/SFX mix + one Remotion bundle
-#   render:  frames split across up to 20 runners at once
+#   render:  frames split across 10 runners (GitHub runs about 10 at once; more just queue)
 #   stitch:  frames + sound -> MP4 (artifact "video") and a contact sheet (artifact "sheet") to check
 name: make
 on:
   workflow_dispatch:
     inputs:
       plan: { description: "Plan file", default: "videos/awake/plan.json" }
-      chunks: { description: "Parallel render machines", default: "20" }
+      chunks: { description: "Parallel render machines (GitHub runs ~10 at once; more just queue)", default: "10" }
       scale: { description: "Render scale (0.75 = 810x1440, upscaled to 1080x1920)", default: "0.75" }
 
 jobs:

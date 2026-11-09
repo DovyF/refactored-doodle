@@ -19,7 +19,7 @@ import { wallpaper, wainscot, carpet, ceiling, blanket, mahogany, drape, sheetTe
 
 // ---------------- light presets: the skill's day light, plus a brighter-shade interior version ----------------
 const INT: LightPreset = { ...LIGHTS.day, shade: [0.6, 0.56, 0.66], lift: [0.06, 0.06, 0.1], fogNear: 60, fogFar: 600, charShade: 0.9 };
-const NIGHT: LightPreset = { ...LIGHTS.day, lit: [0.5, 0.56, 0.9], shade: [0.17, 0.19, 0.36], lift: [0.03, 0.04, 0.12], charTint: [0.72, 0.78, 1.0], charShade: 0.82,
+const NIGHT: LightPreset = { ...LIGHTS.day, lit: [0.42, 0.5, 0.95], shade: [0.11, 0.13, 0.3], lift: [0.02, 0.03, 0.11], charTint: [0.66, 0.74, 1.0], charShade: 0.72,
   fog: "#1b2240", fogNear: 60, fogFar: 600, sunCol: "#a9bcff", sunI: 1.6, sky: "#3a4a8a", ground: "#20203a", hemiI: 0.4 };
 const PRESET: Record<LightName, LightPreset> = { int: INT, day: { ...LIGHTS.day, fogNear: 60, fogFar: 520 }, golden: { ...LIGHTS.golden, fogNear: 80, fogFar: 600 }, night: NIGHT };
 const NIGHT_SKY = { c: ["#3a4378", "#2c3566", "#202852", "#161d40", "#0d1230"], e: [0, 3, 8, 16, 40] };
@@ -85,6 +85,8 @@ export class World {
   private actors: Actor[] = [];
   private fxs: Fx[] = [];
   private sun: THREE.DirectionalLight; private hemi: THREE.HemisphereLight;
+  /** self-lit materials: dimmed walls/ceilings and brighter lamps at night */
+  private glow: { m: THREE.MeshLambertMaterial; day: THREE.Color; night: THREE.Color }[] = [];
   private sky: THREE.Mesh; private skyMat: THREE.ShaderMaterial;
   private fog = new THREE.Fog("#bccbec", 60, 600);
   private clouds: { m: THREE.Mesh; off: THREE.Vector3 }[] = [];
@@ -140,6 +142,8 @@ export class World {
     M.white = lam("p_white", () => ({ color: "#f3efe6" }));
     M.trim = lam("p_trim", () => ({ color: "#f7f4ec" }));
     M.lampshade = lam("p_shade", () => ({ color: "#f3e3b8", emissive: new THREE.Color(0.55, 0.45, 0.25) }));
+    for (const [m, k] of [[M.wall, 0.35], [M.wains, 0.35], [M.ceil, 0.25]] as const) { const e = (m as THREE.MeshLambertMaterial).emissive; if (e) this.glow.push({ m: m as THREE.MeshLambertMaterial, day: e.clone(), night: e.clone().multiplyScalar(k) }); }
+    this.glow.push({ m: M.lampshade as THREE.MeshLambertMaterial, day: new THREE.Color(0.55, 0.45, 0.25), night: new THREE.Color(1.9, 1.35, 0.6) });
     const bulb = new THREE.MeshBasicMaterial({ color: new THREE.Color(3.2, 2.6, 1.7) });
     const crystal = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.6, 1.6, 1.75) });
     M.facade = lam("p_facadeM", () => ({ map: facade() }));
@@ -473,6 +477,7 @@ export class World {
     sc.left = -Rr; sc.right = Rr; sc.top = Rr; sc.bottom = -Rr; sc.near = 20; sc.far = 480; sc.updateProjectionMatrix();
     this.sun.shadow.bias = L.bias; this.sun.shadow.normalBias = L.normalBias * (Rr / 12);
     const lk = S.light === "golden" ? LOOK.golden : LOOK.day;
+    for (const g of this.glow) g.m.emissive.copy(S.light === "night" ? g.night : g.day);
     TONE.uLitCol.value.set(...L.lit); TONE.uShadeCol.value.set(...L.shade); TONE.uShadeLift.value.set(...L.lift);
     TONE.uLambert.value = L.lambert; TONE.uSideK.value = L.sideK; TONE.uTerm.value = L.term; TONE.uBounce.value.set(...lk.bounce); TONE.uSat.value = lk.sat;
     CHAR.uCharTint.value.set(...L.charTint); CHAR.uCharShade.value = L.charShade; CHAR.uGrad.value = L.charGrad;

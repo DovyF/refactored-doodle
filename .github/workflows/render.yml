@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       comp: { description: "Composition id", default: "WindowShort" }
-      chunks: { description: "How many runners (max 20 at once on the free plan)", default: "20" }
+      chunks: { description: "How many runners (GitHub runs ~10 at once; more just queue)", default: "10" }
       scale: { description: "1 = 1080x1920", default: "1" }
       audio: { description: "Sound mix (wav) in the repo", default: "audio/mix2.wav" }
       name: { description: "Output file name", default: "short" }

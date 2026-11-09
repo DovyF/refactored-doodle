@@ -4,7 +4,7 @@ Free parallel renderer for animated "What if you…" Shorts: flat cartoon charac
 (three.js inside Remotion), voice from Kokoro, word timings from Whisper, synthesized music and sound effects.
 
 ## Render a video
-Actions → **render** → Run workflow. It splits the frames across up to 20 runners, then stitches them with the
+Actions → **render** → Run workflow. It splits the frames across 10 runners, then stitches them with the
 sound mix. Download the finished MP4 from the run's **video** artifact.
 
 ## Layout

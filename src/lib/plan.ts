@@ -15,7 +15,27 @@ export type Beat = {
 export type Line = { text: string; set: string; light?: LightName; shot?: string; actors?: Record<string, ActorSpec>; props?: string[]; beats?: Beat[]; music?: string; clock?: number };
 export type Plan = { id: string; title?: string; voice?: { name?: string; speed?: number }; cast: Record<string, string | ToyLook>; lines: Line[] };
 export type Word = { w: string; s: number; e: number; line: number };
-export type Overlay = { kind: "text" | "icon" | "stamp" | "brain"; value: string; where: string; f0: number; f1: number; n?: number };
+export type Overlay = { kind: "text" | "icon" | "stamp" | "brain"; value: string; where: string; f0: number; f1: number; n?: number;
+  /** placed by layout(): top edge and horizontal centre offset in 1080 x 1920 screen px, kept clear of faces */
+  y?: number; x?: number };
+
+// ---------------- overlay layout: keep on-screen text/icons off faces ----------------
+export const SCREEN_W = 1080, SCREEN_H = 1920;
+/** preferred top edge per slot */
+export const SLOT_Y: Record<string, number> = { top: 150, middle: 860, bottom: 1450 };
+/** card geometry (cast.ts SU = 2.16 m per 1000 design units; head centre y = 335, beanie top ~ 79, chin ~ 481, soles 975) */
+const SU = 0.00216, HEAD_TOP = (975 - 60) * SU, HEAD_BOT = (975 - 490) * SU, HEAD_HALF = 175 * SU, BODY_HALF = 215 * SU;
+type Rect = [number, number, number, number]; // x0, y0, x1, y1
+const area = (a: Rect, b: Rect) => Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0])) * Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+/** rough on-screen size of an overlay before its pop animation */
+export const overlaySize = (o: Overlay): [number, number] => {
+  if (o.kind === "icon") return [300, 300];
+  if (o.kind === "stamp") return [Math.min(1000, 120 + o.value.length * 62), 250];
+  if (o.kind === "brain") return [404, 302];
+  const words = o.value.split(/\s+/); let lines = 1, cur = 0;
+  for (const w of words) { const n = w.length + (cur ? 1 : 0); if (cur + n > 13 && cur) { lines++; cur = w.length; } else cur += n; }
+  return [Math.min(960, 90 + Math.max(...words.map((w) => w.length), Math.min(13, o.value.length)) * 70), lines * 118 + 20];
+};
 
 // ---------------- the cast library (every character uses the Toy body) ----------------
 export const LOOKS: Record<string, ToyLook> = {
@@ -132,6 +152,55 @@ export class Timeline {
       }
       prevActors = fin; prevSet = line.set;
     });
+    this.layout();
+  }
+
+  /** world point -> 1080 x 1920 screen px (null when behind the camera) */
+  private project(c: Cam, p: V3): [number, number, number] | null {
+    const f0 = sub(c.look, c.pos), fl = Math.hypot(...f0) || 1, fw = mulv(f0, 1 / fl);
+    let r: V3 = [-fw[2], 0, fw[0]]; const rl = Math.hypot(...r) || 1; r = mulv(r, 1 / rl);
+    let u: V3 = [r[1] * fw[2] - r[2] * fw[1], r[2] * fw[0] - r[0] * fw[2], r[0] * fw[1] - r[1] * fw[0]];
+    const cr = Math.cos(c.roll), sr = Math.sin(c.roll), r2 = add(mulv(r, cr), mulv(u, sr)); u = add(mulv(r, -sr), mulv(u, cr)); r = r2;
+    const d = sub(p, c.pos), z = d[0] * fw[0] + d[1] * fw[1] + d[2] * fw[2];
+    if (z < 0.05) return null;
+    const t = Math.tan((c.fov * Math.PI) / 360), ny = (d[0] * u[0] + d[1] * u[1] + d[2] * u[2]) / (z * t), nx = (d[0] * r[0] + d[1] * r[1] + d[2] * r[2]) / (z * t * (SCREEN_W / SCREEN_H));
+    return [((nx + 1) / 2) * SCREEN_W, ((1 - ny) / 2) * SCREEN_H, (SCREEN_H / 2) / (z * t)]; // px per metre at that depth
+  }
+  /** screen rectangles of every head and body visible at frame f */
+  private bodiesAt(f: number): { heads: Rect[]; bodies: Rect[] } {
+    const seg = this.segAt(f), cam = this.camAt(seg, f), heads: Rect[] = [], bodies: Rect[] = [];
+    for (const a of this.castAt(seg.line, Math.min(f, this.lineB[seg.line] - 1))) {
+      if (a.lie) { const h = this.project(cam, a.head); if (h) { const k = h[2] * 0.5; heads.push([h[0] - k, h[1] - k, h[0] + k, h[1] + k]); } continue; }
+      const dy = a.pose === "sit" ? -70 * SU : 0, base = a.pos;
+      const top = this.project(cam, add(base, [0, HEAD_TOP + dy, 0])), chin = this.project(cam, add(base, [0, HEAD_BOT + dy, 0])), foot = this.project(cam, base);
+      if (!top || !chin) continue;
+      heads.push([chin[0] - HEAD_HALF * chin[2], top[1], chin[0] + HEAD_HALF * chin[2], chin[1]]);
+      if (foot) bodies.push([foot[0] - BODY_HALF * foot[2], chin[1], foot[0] + BODY_HALF * foot[2], foot[1]]);
+    }
+    return { heads, bodies };
+  }
+  /** pick each overlay's position: its slot if that is clear of faces, else the nearest clear spot */
+  private layout() {
+    const placed: { o: Overlay; r: Rect }[] = [];
+    for (const o of this.overlays) {
+      const [w, h] = overlaySize(o), want = o.kind === "brain" ? 70 : SLOT_Y[o.where] ?? 820;
+      const samples = [o.f0 + 4, Math.round((o.f0 + o.f1) / 2), o.f1 - 2];
+      for (const s of this.segs) if (s.a > o.f0 && s.a < o.f1) samples.push(s.a + 2);
+      const obs = samples.filter((f) => f >= o.f0 && f < o.f1).map((f) => this.bodiesAt(f));
+      const bodyW = o.kind === "text" ? 0.15 : 1.5, others = placed.filter((p) => p.o.f0 < o.f1 && o.f0 < p.o.f1).map((p) => p.r);
+      const xs = o.kind === "text" ? [0] : [0, -270, 270, -170, 170];
+      let best = { y: want, x: 0, score: Infinity };
+      for (const x of xs) for (let y = 90; y + h <= 1640; y += 20) {
+        const r: Rect = [SCREEN_W / 2 + x - w / 2 - 20, y - 15, SCREEN_W / 2 + x + w / 2 + 20, y + h + 15];
+        if (r[0] < 0 || r[2] > SCREEN_W) continue;
+        let score = Math.abs(y - want) * 6 + Math.abs(x) * 3;
+        for (const ob of obs) { for (const hr of ob.heads) score += area(r, hr) * 12 / obs.length; for (const br of ob.bodies) score += area(r, br) * bodyW / obs.length; }
+        for (const or2 of others) score += area(r, or2) * 20;
+        if (score < best.score) best = { y, x, score };
+      }
+      o.y = best.y; o.x = best.x;
+      placed.push({ o, r: [SCREEN_W / 2 + best.x - w / 2, best.y, SCREEN_W / 2 + best.x + w / 2, best.y + h] });
+    }
   }
 
   private markPos(set: SetDef, at?: string): V3 {
