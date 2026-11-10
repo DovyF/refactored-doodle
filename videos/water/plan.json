@@ -1,0 +1,428 @@
+{
+ "id": "water",
+ "title": "What if you stopped drinking water for three days?",
+ "voice": {
+  "name": "am_michael",
+  "speed": 1.2
+ },
+ "cast": {
+  "you": "you-pj",
+  "friend": "friend"
+ },
+ "lines": [
+  {
+   "text": "Your body is up to sixty percent water, and today you're going to stop drinking it.",
+   "set": "bedroom",
+   "light": "int",
+   "shot": "close:you",
+   "music": "dream",
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "smile"
+    }
+   },
+   "beats": [
+    {
+     "on": "sixty",
+     "text": "UP TO 60%"
+    },
+    {
+     "on": "stop",
+     "actor": "you",
+     "face": "shock"
+    },
+    {
+     "on": "stop",
+     "card": "cross",
+     "at": "you",
+     "sfx": "boing"
+    },
+    {
+     "on": "drinking",
+     "kick": 0.5
+    }
+   ]
+  },
+  {
+   "text": "Day one. You skip the glass on your nightstand, and you feel completely fine.",
+   "set": "bedroom",
+   "light": "day",
+   "shot": "wide",
+   "music": "march",
+   "props": [
+    "clock"
+   ],
+   "clock": 4,
+   "actors": {
+    "you": {
+     "at": "floor",
+     "pose": "stand",
+     "face": "smile"
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 1"
+    },
+    {
+     "on": "skip",
+     "actor": "you",
+     "pose": "shrug",
+     "face": "smug",
+     "sfx": "whoosh"
+    },
+    {
+     "on": "nightstand",
+     "shot": "insert:lamp"
+    },
+    {
+     "on": "fine",
+     "shot": "close:you",
+     "actor": "you",
+     "face": "grin",
+     "sfx": "ding"
+    }
+   ]
+  },
+  {
+   "text": "By tonight, your mouth is dry, and you barely pee. You stare at the juice on the table.",
+   "set": "dining",
+   "light": "night",
+   "shot": "mid:you",
+   "music": "tense",
+   "props": [
+    "juice"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "tonight",
+     "text": "NIGHT 1"
+    },
+    {
+     "on": "dry",
+     "actor": "you",
+     "face": "strain"
+    },
+    {
+     "on": "dry",
+     "card": "sweat",
+     "at": "you"
+    },
+    {
+     "on": "barely",
+     "actor": "you",
+     "face": "sad"
+    },
+    {
+     "on": "juice",
+     "shot": "insert:plate",
+     "sfx": "tick"
+    },
+    {
+     "on": "stare",
+     "shot": "close:you",
+     "actor": "you",
+     "face": "wide",
+     "eye": 1
+    }
+   ]
+  },
+  {
+   "text": "Day two. Headache. Dizzy. Dark pee. Everything feels heavy.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "high:you",
+   "music": "tense",
+   "props": [
+    "clock"
+   ],
+   "clock": 8,
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "dazed"
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 2"
+    },
+    {
+     "on": "headache",
+     "actor": "you",
+     "face": "strain",
+     "card": "exclaim",
+     "at": "you",
+     "sfx": "thud",
+     "kick": 0.5
+    },
+    {
+     "on": "dizzy",
+     "actor": "you",
+     "face": "dazed",
+     "eye": -1,
+     "sfx": "wobble"
+    },
+    {
+     "on": "heavy",
+     "actor": "you",
+     "face": "sad",
+     "sfx": "thud",
+     "kick": 0.7
+    }
+   ]
+  },
+  {
+   "text": "You walk past the sink three times. Your friend asks what you're doing. You say, an experiment.",
+   "set": "dining",
+   "light": "int",
+   "shot": "two:you,friend",
+   "music": "march",
+   "actors": {
+    "you": {
+     "at": "table.left",
+     "pose": "stand",
+     "face": "smile"
+    },
+    "friend": {
+     "at": "table.right",
+     "face": "sus"
+    }
+   },
+   "beats": [
+    {
+     "on": "walk",
+     "actor": "you",
+     "pose": "walk",
+     "to": "floor"
+    },
+    {
+     "on": "three",
+     "text": "3 TIMES",
+     "where": "top",
+     "sfx": "tick"
+    },
+    {
+     "on": "friend",
+     "actor": "friend",
+     "face": "sus",
+     "card": "qmark",
+     "at": "friend"
+    },
+    {
+     "on": "experiment",
+     "actor": "you",
+     "pose": "point",
+     "face": "smug",
+     "sfx": "ding"
+    }
+   ]
+  },
+  {
+   "text": "Wait... why not just drink? You see, thirst is your body's low battery warning, and you keep ignoring it.",
+   "set": "office",
+   "light": "int",
+   "shot": "dutch:you",
+   "music": "tense",
+   "actors": {
+    "you": {
+     "at": "desk",
+     "pose": "sit",
+     "face": "think",
+     "hold": "phone"
+    }
+   },
+   "beats": [
+    {
+     "on": "wait",
+     "kick": 0.9,
+     "sfx": "hit"
+    },
+    {
+     "on": "wait",
+     "actor": "you",
+     "face": "shock"
+    },
+    {
+     "on": "battery",
+     "text": "1%",
+     "where": "top",
+     "sfx": "tick"
+    },
+    {
+     "on": "warning",
+     "card": "exclaim",
+     "at": "you",
+     "sfx": "boing"
+    },
+    {
+     "on": "ignoring",
+     "actor": "you",
+     "face": "sus",
+     "hold": null
+    }
+   ]
+  },
+  {
+   "text": "Day three. The rule of thumb says this is about your limit. Your heart races, and you can't think straight.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "close:you",
+   "music": "tense",
+   "props": [
+    "clock"
+   ],
+   "clock": 12,
+   "actors": {
+    "you": {
+     "at": "floor",
+     "pose": "stand",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "day",
+     "text": "DAY 3"
+    },
+    {
+     "on": "limit",
+     "icon": "clock",
+     "sfx": "tick"
+    },
+    {
+     "on": "heart",
+     "sfx": "heartbeat"
+    },
+    {
+     "on": "races",
+     "shot": "snap:you",
+     "actor": "you",
+     "face": "panic",
+     "sweat": true,
+     "kick": 0.6
+    },
+    {
+     "on": "think",
+     "actor": "you",
+     "face": "blank"
+    }
+   ]
+  },
+  {
+   "text": "So you finally drink. Just a little. Slowly.",
+   "set": "dining",
+   "light": "int",
+   "shot": "mid:you",
+   "music": "soft",
+   "props": [
+    "juice"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "face": "sleepy",
+     "hold": "coffee"
+    }
+   },
+   "beats": [
+    {
+     "on": "drink",
+     "actor": "you",
+     "face": "love",
+     "sfx": "pop"
+    },
+    {
+     "on": "slowly",
+     "actor": "you",
+     "face": "smile",
+     "sfx": "ding"
+    }
+   ]
+  },
+  {
+   "text": "Slow sips, and your body starts to recover.",
+   "set": "bedroom",
+   "light": "golden",
+   "shot": "orbit:you",
+   "music": "soft",
+   "actors": {
+    "you": {
+     "at": "floor",
+     "pose": "cheer",
+     "face": "proud"
+    }
+   },
+   "beats": [
+    {
+     "on": "sips",
+     "card": "stars",
+     "at": "you",
+     "sfx": "ding"
+    },
+    {
+     "on": "recover",
+     "card": "check",
+     "at": "you",
+     "sfx": "fanfare"
+    }
+   ]
+  },
+  {
+   "text": "Tomorrow you'll be up to sixty percent water again... and you'll skip the glass.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "close:you",
+   "music": "dream",
+   "props": [
+    "clock"
+   ],
+   "clock": 3,
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "sleepy"
+    }
+   },
+   "beats": [
+    {
+     "on": "tomorrow",
+     "text": "DAY 1"
+    },
+    {
+     "on": "skip",
+     "actor": "you",
+     "pose": "shrug",
+     "face": "smug",
+     "sfx": "whoosh"
+    },
+    {
+     "on": "glass",
+     "card": "cross",
+     "at": "you",
+     "sfx": "boing",
+     "kick": 0.6
+    }
+   ]
+  }
+ ],
+ "sources": [
+  "USGS Water Science School: Water in You (up to 60% of adult body)",
+  "Wikipedia: Rule of threes (survival) (three days is a rule of thumb; heat shortens it)",
+  "Harvard Health: symptoms of dehydration (thirst, headache, dark urine, dizziness, rapid heartbeat, confusion; slow small sips)"
+ ]
+}
