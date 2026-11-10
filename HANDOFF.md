@@ -34,3 +34,4 @@ Done: overlays kept off faces, real night look, 10 render chunks, stronger awake
 
 ## Log
 - 2026-11-09 · built plan pipeline + "awake" video (54 s, 26.5 min on GitHub) · ~8.8M effective tokens (Opus, one long chat).
+- 2026-11-10 · coffee2: fixed engine (cup props, tighter mid shot, text kept out of bottom 540 px, insert:cups, bigger contact sheet) and rewrote script. Lessons: show every counted noun on screen; no insert on an empty desk; avoid bed-level night shots; write facts as a story with a stake, end on a joke.

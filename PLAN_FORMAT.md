@@ -5,7 +5,7 @@ sound effects, render, stitch) is done for free by the **make** workflow (Action
 
 ## Script rules (what makes it good)
 1. **Hook = a paradox in line 1**, no setup. ("Stay awake for eleven days, and your brain starts sleeping without telling you.")
-2. **Second person**: "you" is the hero. Present tense, short spoken sentences, 3.5–4 words per second, 40–60 s total.
+2. **Second person**: "you" is the hero. Present tense, short spoken sentences, about 2.5–2.8 words per second (100–120 words), 35–50 s total. Read it aloud first; it must sound like a person, not a pamphlet.
 3. **Escalate** 3–5 beats, each bigger than the last; one visible gag per line.
 4. **"Wait…"** beat (a question the viewer is already asking), then **"You see,"** + one everyday comparison.
 5. **Ironic payoff** in the last line that loops back to the first.
@@ -33,6 +33,7 @@ sound effects, render, stitch) is done for free by the **make** workflow (Action
 - **pose**: stand, walk, sit, lie, wave, point, push, shrug, cheer, think, facepalm.
 - **face**: neutral, smile, grin, laugh, shock, nervous, strain, stern, sleepy, dazed, sad, smug, asleep, wide, think, angry, cry (tears), sus (suspicious squint), love (heart eyes), yawn, proud, panic, blank (dot eyes: brain switched off).
 - **things** (`hold`, `give`): phone, keys, card, folder, coffee, paper, pencil.
+- **cups** (dining): props `cup1`..`cup10` are paper cups on the table; pop each in with a beat `prop`, and list the earlier ones in the line's `props` so the pile persists. `insert:cups` shows the pile. Use them for any count (coffees, glasses).
 - **props** (on for the whole line, or pop in with a beat `prop`): boxes, car, pancakes, bacon, juice, eggs, toast, fancy, receipt, folder, pinball, poster, clock, coffee. `clock: n` spins the bedroom clock n hours over the line.
 - **beats** (`on` = a word of the line; `word#2` = its 2nd time; `start`/`end`), any of:
   - change an actor: `actor` + `pose` / `face` / `eye` / `hold` / `give` (hands a thing) / `to` (walks to a mark) / `lie`
