@@ -1,0 +1,380 @@
+{
+ "id": "coffee2",
+ "title": "What if you drank ten coffees in one day?",
+ "voice": {
+  "name": "am_michael",
+  "speed": 1.1
+ },
+ "cast": {
+  "you": "you",
+  "friend": "friend"
+ },
+ "lines": [
+  {
+   "text": "Ten coffees in one day sounds like a great Tuesday. After cup three, the FDA would like a word.",
+   "set": "dining",
+   "light": "day",
+   "shot": "close:you",
+   "music": "march",
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "hold": "coffee",
+     "face": "grin"
+    },
+    "friend": {
+     "at": "table.right",
+     "pose": "stand",
+     "face": "neutral"
+    }
+   },
+   "beats": [
+    {
+     "on": "ten",
+     "text": "10 COFFEES",
+     "where": "top",
+     "sfx": "hit",
+     "kick": 0.7
+    },
+    {
+     "on": "great",
+     "actor": "you",
+     "face": "smug"
+    },
+    {
+     "on": "tuesday",
+     "shot": "mid:you"
+    },
+    {
+     "on": "fda",
+     "shot": "two:you,friend",
+     "actor": "friend",
+     "pose": "point",
+     "face": "stern",
+     "sfx": "ding"
+    },
+    {
+     "on": "word",
+     "actor": "you",
+     "face": "nervous",
+     "card": "qmark",
+     "at": "you"
+    }
+   ]
+  },
+  {
+   "text": "The FDA says four hundred milligrams a day is fine for most adults. That's about three big cups, and you're pouring number four.",
+   "set": "dining",
+   "light": "day",
+   "shot": "mid:you",
+   "music": "march",
+   "props": [
+    "cup1",
+    "cup2",
+    "cup3"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "hold": "coffee",
+     "face": "smile"
+    },
+    "friend": {
+     "at": "table.right",
+     "pose": "stand",
+     "face": "smile"
+    }
+   },
+   "beats": [
+    {
+     "on": "hundred",
+     "text": "400 MG A DAY",
+     "where": "top"
+    },
+    {
+     "on": "adults",
+     "actor": "you",
+     "pose": "shrug",
+     "face": "smug"
+    },
+    {
+     "on": "three",
+     "shot": "insert:cups",
+     "sfx": "tick"
+    },
+    {
+     "on": "pouring",
+     "shot": "two:you,friend",
+     "actor": "friend",
+     "give": "coffee",
+     "sfx": "whoosh"
+    },
+    {
+     "on": "four#2",
+     "prop": "cup4",
+     "sfx": "pop"
+    }
+   ]
+  },
+  {
+   "text": "Your heart picks up speed. Your hands start to shake. By cup seven, you're somehow nervous about nothing.",
+   "set": "dining",
+   "light": "golden",
+   "shot": "dutch:you",
+   "music": "tense",
+   "props": [
+    "cup1",
+    "cup2",
+    "cup3",
+    "cup4"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "hold": "coffee",
+     "face": "smile"
+    },
+    "friend": {
+     "at": "table.right",
+     "pose": "stand",
+     "face": "smile"
+    }
+   },
+   "beats": [
+    {
+     "on": "heart",
+     "actor": "you",
+     "face": "nervous",
+     "sweat": true,
+     "sfx": "heartbeat"
+    },
+    {
+     "on": "speed",
+     "prop": "cup5",
+     "sfx": "pop",
+     "kick": 0.5
+    },
+    {
+     "on": "shake",
+     "shot": "close:you",
+     "actor": "you",
+     "face": "strain",
+     "kick": 0.9,
+     "sfx": "wobble",
+     "prop": "cup6"
+    },
+    {
+     "on": "seven",
+     "text": "CUP 7",
+     "where": "top",
+     "prop": "cup7",
+     "sfx": "pop"
+    },
+    {
+     "on": "nothing",
+     "shot": "mid:you",
+     "actor": "you",
+     "face": "wide",
+     "eye": 1
+    },
+    {
+     "on": "nothing",
+     "actor": "friend",
+     "face": "sus"
+    }
+   ]
+  },
+  {
+   "text": "Cup nine, your stomach wants out. Nausea, headache, the whole menu.",
+   "set": "dining",
+   "light": "golden",
+   "shot": "high:you",
+   "music": "tense",
+   "props": [
+    "cup1",
+    "cup2",
+    "cup3",
+    "cup4",
+    "cup5",
+    "cup6",
+    "cup7"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "hold": "coffee",
+     "face": "nervous",
+     "sweat": true
+    },
+    "friend": {
+     "at": "table.right",
+     "pose": "stand",
+     "face": "sus"
+    }
+   },
+   "beats": [
+    {
+     "on": "cup",
+     "prop": "cup8",
+     "sfx": "pop"
+    },
+    {
+     "on": "nine",
+     "prop": "cup9",
+     "sfx": "pop",
+     "text": "CUP 9",
+     "where": "top"
+    },
+    {
+     "on": "stomach",
+     "actor": "you",
+     "face": "sad"
+    },
+    {
+     "on": "nausea",
+     "actor": "you",
+     "face": "dazed",
+     "eye": -1,
+     "sfx": "wobble"
+    },
+    {
+     "on": "headache",
+     "shot": "snap:you",
+     "actor": "you",
+     "face": "strain",
+     "sfx": "thud",
+     "kick": 0.6
+    },
+    {
+     "on": "menu",
+     "actor": "friend",
+     "face": "shock",
+     "card": "exclaim",
+     "at": "friend"
+    }
+   ]
+  },
+  {
+   "text": "Around twelve hundred milligrams, taken fast, the FDA says seizures can happen. Ten big cups can get you there.",
+   "set": "dining",
+   "light": "night",
+   "shot": "orbit:you",
+   "music": "stop",
+   "speed": 1.0,
+   "props": [
+    "cup1",
+    "cup2",
+    "cup3",
+    "cup4",
+    "cup5",
+    "cup6",
+    "cup7",
+    "cup8",
+    "cup9"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "hold": "coffee",
+     "face": "wide",
+     "sweat": true
+    },
+    "friend": {
+     "at": "table.right",
+     "pose": "stand",
+     "face": "shock"
+    }
+   },
+   "beats": [
+    {
+     "on": "twelve",
+     "text": "1,200 MG",
+     "where": "top"
+    },
+    {
+     "on": "seizures",
+     "shot": "snap:you",
+     "sfx": "riser",
+     "kick": 0.5
+    },
+    {
+     "on": "happen",
+     "actor": "you",
+     "face": "panic",
+     "sfx": "hit",
+     "kick": 0.9
+    },
+    {
+     "on": "ten",
+     "prop": "cup10",
+     "sfx": "pop"
+    },
+    {
+     "on": "there",
+     "shot": "insert:cups",
+     "sfx": "tick"
+    }
+   ]
+  },
+  {
+   "text": "Stop at three and you're fine. Honestly, that's the whole video.",
+   "set": "dining",
+   "light": "day",
+   "shot": "wide",
+   "music": "soft",
+   "props": [
+    "cup1",
+    "cup2",
+    "cup3"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "hold": "coffee",
+     "face": "smile"
+    },
+    "friend": {
+     "at": "table.right",
+     "pose": "stand",
+     "face": "grin"
+    }
+   },
+   "beats": [
+    {
+     "on": "fine",
+     "actor": "you",
+     "face": "smile",
+     "sfx": "ding"
+    },
+    {
+     "on": "honestly",
+     "actor": "you",
+     "pose": "shrug",
+     "face": "smug"
+    },
+    {
+     "on": "whole",
+     "shot": "close:you",
+     "actor": "friend",
+     "pose": "cheer",
+     "face": "laugh"
+    },
+    {
+     "on": "video",
+     "actor": "you",
+     "face": "grin",
+     "sfx": "pop"
+    }
+   ]
+  }
+ ],
+ "sources": [
+  "FDA: Spilling the Beans: How Much Caffeine Is Too Much? (400 mg/day fine for most adults, about 2-3 12 oz cups; symptoms incl. racing heart, jitters, anxiety, nausea, headache; about 1,200 mg consumed rapidly can cause seizures)"
+ ]
+}

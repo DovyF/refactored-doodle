@@ -447,6 +447,16 @@ export class World {
       g.add(mesh(new THREE.TorusGeometry(0.035, 0.012, 8, 16), lam("p_mug", () => ({ color: "#f4efe6" })), 0.065, 0.065, 0));
       g.userData.pop = true; reg("coffee", g);
     }
+    // paper cups on the dining table: cup1..cup10 pop in one by one, so a count ("ten coffees") is visible as a growing pile
+    {
+      const cupM = lam("p_cup", () => ({ color: "#fbf6ea" })), bandM = lam("p_cupBand", () => ({ color: "#d8433a" }));
+      for (let i = 0; i < 10; i++) {
+        const g = grp([DIN[0] - 0.3 + (i % 5) * 0.15, TABLE_TOP, DIN[2] - (i < 5 ? 0.12 : 0.32)]);
+        g.add(mesh(new THREE.CylinderGeometry(0.052, 0.038, 0.11, 18), cupM, 0, 0.055, 0));
+        g.add(mesh(new THREE.CylinderGeometry(0.0498, 0.0458, 0.03, 18), bandM, 0, 0.065, 0));
+        g.userData.pop = true; reg(`cup${i + 1}`, g);
+      }
+    }
     // the car on the lawn (always there unless the plan hides it)
     for (const m of this.root.children.slice(this.carFrom, this.carTo)) reg("car", m);
 

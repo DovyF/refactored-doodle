@@ -190,7 +190,7 @@ export class Timeline {
       const bodyW = o.kind === "text" ? 0.15 : 1.5, others = placed.filter((p) => p.o.f0 < o.f1 && o.f0 < p.o.f1).map((p) => p.r);
       const xs = o.kind === "text" ? [0] : [0, -270, 270, -170, 170];
       let best = { y: want, x: 0, score: Infinity };
-      for (const x of xs) for (let y = 90; y + h <= 1640; y += 20) {
+      for (const x of xs) for (let y = 130; y + h <= 1380; y += 20) { // stay out of the Shorts buttons / caption area at the bottom
         const r: Rect = [SCREEN_W / 2 + x - w / 2 - 20, y - 15, SCREEN_W / 2 + x + w / 2 + 20, y + h + 15];
         if (r[0] < 0 || r[2] > SCREEN_W) continue;
         let score = Math.abs(y - want) * 6 + Math.abs(x) * 3;
@@ -249,7 +249,7 @@ export class Timeline {
     const roll = (seg.idx % 2 ? -1 : 1) * 0.035;
     let pos: V3, look: V3, fov = 44, dof = 0, focus: V3;
     if (kind === "wide") { [pos, look] = dolly(set.wide.pos, set.wide.look, pushK(x, 0.0018)); fov = set.wide.fov; focus = look; }
-    else if (kind === "insert") { const p = set.spots[arg] ?? this.markPos(set, arg); [pos, look] = dolly(add(p, add(mulv(front, 0.95), [0, 0.45, 0])), p, pushK(x, 0.003)); fov = 40; dof = 12; focus = p; }
+    else if (kind === "insert") { const p = set.spots[arg] ?? this.markPos(set, arg); const far = arg === "cups"; [pos, look] = dolly(add(p, add(mulv(front, far ? 1.5 : 0.95), [0, far ? 0.8 : 0.45, 0])), p, pushK(x, 0.003)); fov = 40; dof = far ? 6 : 12; focus = p; }
     else if (kind === "two") {
       const [a1, b1] = arg.split(","), A = this.subject(seg.line, seg.a, a1), B = this.subject(seg.line, seg.a, b1 ?? a1);
       const mid = mulv(add(A.pos, B.pos), 0.5), d = Math.hypot(A.pos[0] - B.pos[0], A.pos[2] - B.pos[2]);
@@ -268,7 +268,7 @@ export class Timeline {
         const u = smooth(x / 6), d = 4.1 + (2.6 - 4.1) * u;
         pos = add(h, add(mulv(front, d), add(mulv(right, 0.3), [0, 0.0, 0]))); look = add(h, [0, lowY + (0.38) * u, 0]); fov = 44 - 6 * u; dof = 7 + 6 * u;
       } else if (kind === "close") { [pos, look] = dolly(add(h, add(mulv(front, 2.75), add(mulv(right, 0.24), [0, 0.04, 0]))), add(h, [0, -0.24, 0]), pushK(x, 0.003)); fov = 38; dof = 13; }
-      else { [pos, look] = dolly(add(h, add(mulv(front, 4.1), add(mulv(right, 0.4 * sideK), [0, -0.1, 0]))), add(h, [0, lowY, 0]), pushK(x, 0.0022)); fov = 44; dof = 7; }
+      else { [pos, look] = dolly(add(h, add(mulv(front, 3.4), add(mulv(right, 0.4 * sideK), [0, -0.05, 0]))), add(h, [0, lowY * 0.8, 0]), pushK(x, 0.0022)); fov = 44; dof = 7; }
       focus = h;
     }
     let cam: Cam = { pos, look, fov, roll: kind === "close" ? roll : kind === "dutch" ? roll * 4 : 0 };

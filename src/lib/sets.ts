@@ -49,7 +49,7 @@ export const SETS: Record<string, SetDef> = {
     wide: { pos: at(DIN, [1.4, 1.75, 2.0]), look: at(DIN, [0, 1.0, -0.9]), fov: 46 },
     marks: { table: [DIN[0], 0, DIN[2] - 1.05], "table.left": [DIN[0] - 1.05, 0, DIN[2] - 1.05], "table.right": [DIN[0] + 1.05, 0, DIN[2] - 1.05],
       "table.front": [DIN[0] + 0.4, 0, DIN[2] + 0.75], floor: [DIN[0] + 0.3, 0, DIN[2] + 1.2], left: [DIN[0] - 2.0, 0, DIN[2] + 0.4], right: [DIN[0] + 2.0, 0, DIN[2] + 0.4] },
-    spots: { table: [DIN[0], TABLE_TOP, DIN[2] - 0.35], plate: [DIN[0], TABLE_TOP + 0.05, DIN[2] - 0.5], receipt: RECEIPT_AT, poster: [DIN[0] - 0.95, TABLE_TOP + 0.45, DIN[2] - 0.45] },
+    spots: { cups: [DIN[0], TABLE_TOP + 0.06, DIN[2] - 0.22], table: [DIN[0], TABLE_TOP, DIN[2] - 0.35], plate: [DIN[0], TABLE_TOP + 0.05, DIN[2] - 0.5], receipt: RECEIPT_AT, poster: [DIN[0] - 0.95, TABLE_TOP + 0.45, DIN[2] - 0.45] },
   },
   lawn: {
     name: "lawn", origin: WH, light: "day", front: n3([0, 0, 1]), sun: { az: 125, el: 42 },
