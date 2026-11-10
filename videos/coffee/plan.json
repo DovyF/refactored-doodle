@@ -1,0 +1,328 @@
+{
+ "id": "coffee",
+ "title": "What if you drank ten coffees in one day?",
+ "voice": {
+  "name": "am_michael",
+  "speed": 1.1
+ },
+ "cast": {
+  "you": "you"
+ },
+ "lines": [
+  {
+   "text": "Ten coffees in one day. Your heart has opinions about that.",
+   "set": "dining",
+   "light": "day",
+   "shot": "close:you",
+   "music": "march",
+   "props": [
+    "coffee"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "face": "grin",
+     "hold": "coffee"
+    }
+   },
+   "beats": [
+    {
+     "on": "ten",
+     "text": "10 COFFEES",
+     "where": "top",
+     "sfx": "hit",
+     "kick": 0.7
+    },
+    {
+     "on": "heart",
+     "shot": "snap:you",
+     "actor": "you",
+     "face": "nervous",
+     "sfx": "heartbeat"
+    },
+    {
+     "on": "opinions",
+     "card": "exclaim",
+     "at": "you"
+    }
+   ]
+  },
+  {
+   "text": "It's seven in the morning. Cup one is perfect. Cup two is better. You feel unstoppable.",
+   "set": "dining",
+   "light": "golden",
+   "shot": "mid:you",
+   "music": "march",
+   "props": [
+    "coffee"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "face": "smile",
+     "hold": "coffee"
+    }
+   },
+   "beats": [
+    {
+     "on": "seven",
+     "text": "7 AM",
+     "where": "top"
+    },
+    {
+     "on": "one",
+     "text": "CUP 1",
+     "where": "top",
+     "sfx": "pop"
+    },
+    {
+     "on": "two",
+     "text": "CUP 2",
+     "where": "top",
+     "sfx": "pop"
+    },
+    {
+     "on": "unstoppable",
+     "shot": "low:you",
+     "actor": "you",
+     "pose": "cheer",
+     "face": "proud",
+     "card": "stars",
+     "at": "you",
+     "sfx": "ding"
+    }
+   ]
+  },
+  {
+   "text": "Cup three is about where the FDA draws the line. Four hundred milligrams a day is fine for most adults. That's about three cups.",
+   "set": "office",
+   "light": "int",
+   "shot": "wide",
+   "music": "soft",
+   "props": [
+    "coffee"
+   ],
+   "actors": {
+    "you": {
+     "at": "desk",
+     "pose": "sit",
+     "face": "smug",
+     "hold": "coffee"
+    }
+   },
+   "beats": [
+    {
+     "on": "three",
+     "text": "CUP 3",
+     "where": "top",
+     "sfx": "pop"
+    },
+    {
+     "on": "fda",
+     "shot": "insert:desk",
+     "sfx": "click"
+    },
+    {
+     "on": "four",
+     "shot": "mid:you",
+     "text": "400 MG A DAY",
+     "where": "top"
+    },
+    {
+     "on": "milligrams",
+     "stamp": "FDA LIMIT",
+     "sfx": "stamp",
+     "kick": 0.6
+    },
+    {
+     "on": "adults",
+     "actor": "you",
+     "pose": "shrug",
+     "face": "smug"
+    }
+   ]
+  },
+  {
+   "text": "You keep going anyway. By cup six your heart's pounding and you can't sit still. And that's the mild part.",
+   "set": "dining",
+   "light": "golden",
+   "shot": "dutch:you",
+   "music": "tense",
+   "props": [
+    "coffee"
+   ],
+   "actors": {
+    "you": {
+     "at": "table",
+     "pose": "sit",
+     "face": "smug",
+     "hold": "coffee"
+    }
+   },
+   "beats": [
+    {
+     "on": "anyway",
+     "actor": "you",
+     "pose": "cheer",
+     "face": "grin",
+     "sfx": "whoosh"
+    },
+    {
+     "on": "six",
+     "text": "CUP 6",
+     "where": "top",
+     "sfx": "pop"
+    },
+    {
+     "on": "pounding",
+     "actor": "you",
+     "pose": "sit",
+     "face": "panic",
+     "sweat": true,
+     "sfx": "heartbeat",
+     "kick": 0.6
+    },
+    {
+     "on": "still",
+     "actor": "you",
+     "face": "strain"
+    },
+    {
+     "on": "mild",
+     "card": "sweat",
+     "at": "you"
+    }
+   ]
+  },
+  {
+   "text": "Cup eight, your stomach files a complaint. Nausea, headache, the whole menu. Then the number gets serious.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "high:you",
+   "music": "tense",
+   "props": [
+    "coffee"
+   ],
+   "actors": {
+    "you": {
+     "at": "floor",
+     "pose": "stand",
+     "face": "nervous",
+     "hold": "coffee"
+    }
+   },
+   "beats": [
+    {
+     "on": "eight",
+     "text": "CUP 8",
+     "where": "top",
+     "sfx": "pop"
+    },
+    {
+     "on": "stomach",
+     "actor": "you",
+     "face": "sad",
+     "sweat": true
+    },
+    {
+     "on": "nausea",
+     "actor": "you",
+     "face": "dazed",
+     "eye": -1,
+     "sfx": "wobble"
+    },
+    {
+     "on": "headache",
+     "actor": "you",
+     "face": "strain",
+     "sfx": "thud",
+     "kick": 0.5
+    },
+    {
+     "on": "serious",
+     "sfx": "riser"
+    }
+   ]
+  },
+  {
+   "text": "Around twelve hundred milligrams, taken fast, the FDA says seizures are possible. Ten big cups can get you there.",
+   "set": "office",
+   "light": "night",
+   "shot": "orbit:you",
+   "music": "stop",
+   "speed": 1.0,
+   "actors": {
+    "you": {
+     "at": "desk",
+     "pose": "sit",
+     "face": "wide",
+     "hold": null
+    }
+   },
+   "beats": [
+    {
+     "on": "twelve",
+     "text": "1,200 MG",
+     "where": "top"
+    },
+    {
+     "on": "seizures",
+     "shot": "snap:you",
+     "kick": 0.9,
+     "sfx": "hit",
+     "actor": "you",
+     "face": "panic"
+    },
+    {
+     "on": "ten",
+     "text": "10 CUPS",
+     "where": "top"
+    },
+    {
+     "on": "there",
+     "actor": "you",
+     "face": "blank",
+     "sfx": "boing"
+    }
+   ]
+  },
+  {
+   "text": "You stop at ten. You stare at the ceiling until sunrise.",
+   "set": "bedroom",
+   "light": "night",
+   "shot": "wide",
+   "music": "dream",
+   "props": [
+    "clock"
+   ],
+   "clock": 8,
+   "actors": {
+    "you": {
+     "at": "bed",
+     "pose": "sit",
+     "face": "blank",
+     "lie": true
+    }
+   },
+   "beats": [
+    {
+     "on": "ceiling",
+     "shot": "insert:chandelier",
+     "sfx": "tick"
+    },
+    {
+     "on": "sunrise",
+     "shot": "close:you",
+     "actor": "you",
+     "face": "sleepy",
+     "sfx": "tick"
+    }
+   ]
+  }
+ ],
+ "sources": [
+  "FDA: Spilling the Beans: How Much Caffeine Is Too Much? (400 mg/day for most adults, about 2-3 12 oz cups; common symptoms: racing heart, jitters, nausea, headache, insomnia; about 1,200 mg consumed rapidly can cause seizures)"
+ ]
+}
